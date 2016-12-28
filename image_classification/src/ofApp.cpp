@@ -27,7 +27,15 @@ void ofApp::setup() {
     gui.add(&classifierGroup);
     gui.add(&runGroup);
     
-    SetClassifier(kKnn);
+    //old OF default is 96 - but this results in fonts looking larger than in other programs.
+    ofTrueTypeFont::setGlobalDpi(72);
+    
+    verdana14_.load("verdana.ttf", 20, true, true);
+    verdana14_.setLineHeight(18.0f);
+    verdana14_.setLetterSpacing(1.037);
+    
+    // set type of classification
+    SetClassifierType(kKnn);
     
     classifier_ = nullptr;
     
@@ -46,38 +54,6 @@ void ofApp::setup() {
     
     ofFill();
 
-#if 0
-    classifier_ = new SvmClassifier();
-    
-    for (int i = 0; i < 2; i++) {
-        char filepath[256];
-        sprintf(filepath, "/Users/hgsmrmss/Documents/code_samples/python/points_normal%d.csv", i);
-//        sprintf(filepath, "/Users/hgsmrmss/Documents/code_samples/python/points_ring%d.csv", i);
-        LoadCsvAsImage(filepath, '\t', image_);
-        
-        double min_val, max_val;
-        cv::minMaxLoc(image_.col(0), &min_val, &max_val);
-        min_.x = static_cast<float>(min_val);
-        max_.x = static_cast<float>(max_val);
-        cv::minMaxLoc(image_.col(1), &min_val, &max_val);
-        min_.y = static_cast<float>(min_val);
-        max_.y = static_cast<float>(max_val);
-        
-        data_ = cv::Mat(image_, cv::Rect(0, 0, image_.cols - 1, image_.rows));
-        label_ = cv::Mat(image_, cv::Rect(image_.cols - 1, 0, 1, image_.rows));
-        classified_label_ = cv::Mat::zeros(image_.rows, 1, CV_32F);
-        
-        cout << image_.size() << endl;
-        cout << data_.size() << endl;
-        cout << label_.size() << endl;
-        
-        if (i == 0) {
-            classifier_->Train(data_, label_);
-        }
-    }
-    
-    ClassifyData();
-#endif
     
 }
 
@@ -160,6 +136,9 @@ void ofApp::UpdateContours(int width, int height) {
     // for drawing classified data on the window,
     // classified label map is resize to fit size of window.
     //
+    if (label_map_.empty())
+        return;
+    
     cv::resize(label_map_, label_map_resized_, cv::Size2i(width, height));
     
     //Extract contours from resize map
@@ -242,9 +221,14 @@ void ofApp::draw(){
         ofDrawLine(p2, p0);
     }
  
+//    ofSetColor(255, 0, 255);
+//    verdana14_.drawString("test", 50, 50);
     
+    // gui
     gui.setPosition(ofGetWidth() - gui.getWidth() - 10, gui.getPosition().y);
     gui.draw();
+    
+    
 }
 
 //--------------------------------------------------------------
@@ -302,7 +286,7 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
-void ofApp::SetClassifier(Classifiers classifier) {
+void ofApp::SetClassifierType(Classifiers classifier) {
     classifierKnn.removeListener(this, &ofApp::classifierKnnChanged);
     classifierBayes.removeListener(this, &ofApp::classifierBayesChanged);
     classifierSvm.removeListener(this, &ofApp::classifierSvmChanged);
@@ -327,15 +311,15 @@ void ofApp::SetClassifier(Classifiers classifier) {
 }
 
 void ofApp::classifierKnnChanged(bool& show) {
-    SetClassifier(kKnn);
+    SetClassifierType(kKnn);
 }
 
 void ofApp::classifierBayesChanged(bool& show) {
-    SetClassifier(kBayes);
+    SetClassifierType(kBayes);
 }
 
 void ofApp::classifierSvmChanged(bool& show) {
-    SetClassifier(kSvm);
+    SetClassifierType(kSvm);
 }
 
 void ofApp::trainingButtonPressed() {

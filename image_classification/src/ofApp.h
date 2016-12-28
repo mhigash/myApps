@@ -26,6 +26,11 @@ class ofApp : public ofBaseApp{
     ofxButton trainingButton;
     ofxButton classifyButton;
     
+    
+    ofTrueTypeFont	verdana14_;
+    
+    
+    
     Classifiers classifier_type_;
 
     cv::Mat image_;
@@ -46,7 +51,7 @@ class ofApp : public ofBaseApp{
     void ClassifyData();
     void UpdateContours(int width, int height);
     
-    void SetClassifier(Classifiers classifier);
+    void SetClassifierType(Classifiers classifier);
     
 	public:
 		void setup();

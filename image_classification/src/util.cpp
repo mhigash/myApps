@@ -80,10 +80,12 @@ bool LoadCsvAsImage(const string& filepath, char delimiter, cv::Mat& image)
         cv::Mat row = cv::Mat(1, static_cast<int>(elements.size()), CV_32F, array);
         
         if (rows == 0) {
+//            image.release();
             image = cv::Mat(1, static_cast<int>(elements.size()), CV_32F, array);
         } else {
             image.push_back(row);
         }
+        delete[] array;
         
         rows++;
     }

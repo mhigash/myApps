@@ -107,25 +107,41 @@ void ofApp::ClassifyData()
     step.y = (max_.y - min_.y) / mesh_size.height;
     label_map_ = cv::Mat(mesh_size.height, mesh_size.width, CV_32F);
     
-    int row = 0;
-    int col = 0;
+//    int row = 0;
+//    int col = 0;
     
     cv::Mat data(1, 2, CV_32F);
 
-    for (float y = min_.y; y <= max_.y; y += step.y) {
-        for (float x = min_.x; x <= max_.x; x += step.x) {
+//    for (float y = min_.y; y <= max_.y; y += step.y) {
+//        for (float x = min_.x; x <= max_.x; x += step.x) {
+//            
+//            data.at<float>(0, 0) = x;
+//            data.at<float>(0, 1) = y;
+//            
+//            float label = classifier_->Classify(data);
+//            label_map_.at<float>(row, col) = label;
+//            
+//            col++;
+//        }
+//        
+//        row++;
+//        col = 0;
+//    }
+    
+    float y = min_.y;
+    for (int r = 0; r < label_map_.rows; r++) {
+        float x = min_.x;
+        for (int c = 0; c < label_map_.cols; c++) {
             
             data.at<float>(0, 0) = x;
             data.at<float>(0, 1) = y;
             
             float label = classifier_->Classify(data);
-            label_map_.at<float>(row, col) = label;
+            label_map_.at<float>(r, c) = label;
             
-            col++;
+            x += step.x;
         }
-        
-        row++;
-        col = 0;
+        y += step.y;
     }
     
     UpdateContours(width, height);
@@ -174,7 +190,7 @@ void ofApp::draw(){
         
         if (label == classified_label) {
             //
-            // data classified correctly labels are drawn as circle
+            // correctly classified data is drawn as circle
             // label 1 is colored in red
             //
             if (label_.at<float>(r, 0) == 1.0f)

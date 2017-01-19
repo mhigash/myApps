@@ -28,24 +28,24 @@ private:
 	ImageDocumentList documentList;
 	ofEasyCam cam;
 	
-	ofxGuiGroup arithmeticGui;
-	ofParameter<bool> arithmeticAdd;
-	ofParameter<bool> arithmeticSubtract;
-	ofParameter<bool> arithmeticAlphaBlending;
-	ofxFloatSlider arithmeticAlpha;
-	ofParameter<bool> arithmeticRampImage;
-	ofxIntSlider arithmeticRampStart;
-	ofxIntSlider arithmeticRampEnd;
+	ofxGuiGroup blendingGui;
+	ofParameter<bool> blendingAdd;
+	ofParameter<bool> blendingSubtract;
+	ofParameter<bool> blendingAlphaBlending;
+	ofxFloatSlider blendingAlpha;
+	ofParameter<bool> blendingRampImage;
+	ofxIntSlider blendingRampStart;
+	ofxIntSlider blendingRampEnd;
 
-	ArithmeticParams arithmeticParams;
+	BlendingParams blendingParams;
 
-	void resetArithmetics();
-	void arithmeticAddChanged(bool& show);
-	void arithmeticSubtractChanged(bool& show);
-	void arithmeticAlphaBlendingChanged(bool& show);
-	void arithmeticRampImageChanged(bool& show);
-	void arithmeticRampStartChanged(int& value);
-	void arithmeticRampEndChanged(int& value);
+	void resetBlendings();
+	void blendingAddChanged(bool& show);
+	void blendingSubtractChanged(bool& show);
+	void blendingAlphaBlendingChanged(bool& show);
+	void blendingRampImageChanged(bool& show);
+	void blendingRampStartChanged(int& value);
+	void blendingRampEndChanged(int& value);
 	
 	ofxPanel gui;
 

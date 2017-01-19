@@ -351,7 +351,7 @@ bool ImageDocumentList::makeImageList(std::vector<cv::Mat>& imageList)
 	return true;
 }
 
-void ImageDocumentList::updateImage(int updateType)
+void ImageDocumentList::updateImage(UpdateImageType updateType)
 {
 	ImageDocument *imageDoc1 = getActive(ActiveType::ACTIVE_1ST);
 	ImageDocument *imageDoc2 = getActive(ActiveType::ACTIVE_2ND);
@@ -363,7 +363,7 @@ void ImageDocumentList::updateImage(int updateType)
 	}
 
 	// just updating intersection
-	if (updateType == 1)
+	if (updateType == kUpdateIntersectionOnly)
 	{
 		intersect.width = intersect.height = 0;
 		intersectImage.clear();
@@ -418,33 +418,33 @@ void ImageDocumentList::updateImage(int updateType)
 	}
 
 	cv::Mat dst;
-	if (arithmeticParams.type == kArithmeticAdd)
+	if (blendingParams.type == kArithmeticAdd)
 	{
 		dst = src1 + src2;
 	}
-	else if (arithmeticParams.type == kArithmeticSubtract)
+	else if (blendingParams.type == kArithmeticSubtract)
 	{
 		dst = src1 - src2;
 	}
-	else if (arithmeticParams.type == kArithmeticAlphaBlend)
+	else if (blendingParams.type == kArithmeticAlphaBlend)
 	{
-		double alpha = arithmeticParams.alpha;
+		double alpha = blendingParams.alpha;
 		cv::addWeighted(src1, alpha, src2, 1.0 - alpha, 0, dst); 
 	}
-	else if (arithmeticParams.type == kArithmeticRampImage)
+	else if (blendingParams.type == kArithmeticRampImage)
 	{
 		const int width = 100;
-		float a = 1.0f / (arithmeticParams.rampEnd - arithmeticParams.rampStart);
+		float a = 1.0f / (blendingParams.rampEnd - blendingParams.rampStart);
 		float step = 0.0f;
 		cv::Mat temp(1, width, CV_32F);
 			
 		for (int c = 0; c < width; c++)
 		{
-			if (c < arithmeticParams.rampStart)
+			if (c < blendingParams.rampStart)
 			{
 				temp.at<float>(0, c) = 0.0f;
 			}
-			else if (c > arithmeticParams.rampEnd)
+			else if (c > blendingParams.rampEnd)
 			{
 				temp.at<float>(0, c) = 1.0f;
 			}

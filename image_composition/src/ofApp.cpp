@@ -10,20 +10,21 @@ void ofApp::setup(){
 
 	gui.setup();
 
-	arithmeticGui.setup("Arithmetics");
-	arithmeticGui.add(arithmeticAdd.set("add", false, false, true));
-	arithmeticGui.add(arithmeticSubtract.set("subtract", false, false, true));
-	arithmeticGui.add(arithmeticAlphaBlending.set("alpha", false, false, true));
-	arithmeticGui.add(arithmeticAlpha.setup("alpha", 0.5, 0.0, 1.0));
-	arithmeticGui.add(arithmeticRampImage.set("ramp image", false, false, true));
-	arithmeticGui.add(arithmeticRampStart.setup("ramp start", 33, 0, 100));
-	arithmeticGui.add(arithmeticRampEnd.setup("ramp end", 66, 0, 100));
-	arithmeticRampStart.addListener(this, &ofApp::arithmeticRampStartChanged);
-	arithmeticRampEnd.addListener(this, &ofApp::arithmeticRampEndChanged);
-	resetArithmetics();
-	arithmeticAlphaBlending = true;
+	blendingGui.setup();
+	blendingGui.setName("blending");
+	blendingGui.add(blendingAdd.set("add", false, false, true));
+	blendingGui.add(blendingSubtract.set("subtract", false, false, true));
+	blendingGui.add(blendingAlphaBlending.set("alpha", false, false, true));
+	blendingGui.add(blendingAlpha.setup("alpha", 0.5, 0.0, 1.0));
+	blendingGui.add(blendingRampImage.set("ramp image", false, false, true));
+	blendingGui.add(blendingRampStart.setup("ramp start", 33, 0, 100));
+	blendingGui.add(blendingRampEnd.setup("ramp end", 66, 0, 100));
+	blendingRampStart.addListener(this, &ofApp::blendingRampStartChanged);
+	blendingRampEnd.addListener(this, &ofApp::blendingRampEndChanged);
+	resetBlendings();
+	blendingAlphaBlending = true;
 
-	gui.add(&arithmeticGui);
+	gui.add(&blendingGui);
 
 
 	// this uses depth information for occlusion
@@ -163,7 +164,13 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 	lastX = x;
 	lastY = y;
-	documentList.updateImage(1);
+	
+	if (blendingRampImage) {
+		// because it's slow
+		documentList.updateImage(UpdateImageType::kUpdateIntersectionOnly);
+	} else {
+		documentList.updateImage(UpdateImageType::kUpdateAll);
+	}
 }
 
 //--------------------------------------------------------------
@@ -204,7 +211,7 @@ void ofApp::mouseReleased(int x, int y, int button){
 	lastX = 0;
 	lastY = 0;
 
-	documentList.updateImage(0);
+	documentList.updateImage(UpdateImageType::kUpdateAll);
 }
 
 //--------------------------------------------------------------
@@ -222,78 +229,78 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
-void ofApp::resetArithmetics()
+void ofApp::resetBlendings()
 {
-	arithmeticAdd.removeListener(this, &ofApp::arithmeticAddChanged);
-	arithmeticSubtract.removeListener(this, &ofApp::arithmeticSubtractChanged);
-	arithmeticAlphaBlending.removeListener(this, &ofApp::arithmeticAlphaBlendingChanged);
-	arithmeticRampImage.removeListener(this, &ofApp::arithmeticRampImageChanged);
+	blendingAdd.removeListener(this, &ofApp::blendingAddChanged);
+	blendingSubtract.removeListener(this, &ofApp::blendingSubtractChanged);
+	blendingAlphaBlending.removeListener(this, &ofApp::blendingAlphaBlendingChanged);
+	blendingRampImage.removeListener(this, &ofApp::blendingRampImageChanged);
 
-	arithmeticAdd = false;
-	arithmeticSubtract = false;
-	arithmeticAlphaBlending = false;
-	arithmeticRampImage = false;
+	blendingAdd = false;
+	blendingSubtract = false;
+	blendingAlphaBlending = false;
+	blendingRampImage = false;
 
-	arithmeticAdd.addListener(this, &ofApp::arithmeticAddChanged);
-	arithmeticSubtract.addListener(this, &ofApp::arithmeticSubtractChanged);
-	arithmeticAlphaBlending.addListener(this, &ofApp::arithmeticAlphaBlendingChanged);
-	arithmeticRampImage.addListener(this, &ofApp::arithmeticRampImageChanged);
+	blendingAdd.addListener(this, &ofApp::blendingAddChanged);
+	blendingSubtract.addListener(this, &ofApp::blendingSubtractChanged);
+	blendingAlphaBlending.addListener(this, &ofApp::blendingAlphaBlendingChanged);
+	blendingRampImage.addListener(this, &ofApp::blendingRampImageChanged);
 }
 
-void ofApp::arithmeticAddChanged(bool& show)
+void ofApp::blendingAddChanged(bool& show)
 {
-	resetArithmetics();
-	arithmeticAdd = true;
+	resetBlendings();
+	blendingAdd = true;
 	updateParameters();
 }
 
-void ofApp::arithmeticSubtractChanged(bool& show)
+void ofApp::blendingSubtractChanged(bool& show)
 {
-	resetArithmetics();
-	arithmeticSubtract = true;
+	resetBlendings();
+	blendingSubtract = true;
 	updateParameters();
 }
 
-void ofApp::arithmeticAlphaBlendingChanged(bool& show)
+void ofApp::blendingAlphaBlendingChanged(bool& show)
 {
-	resetArithmetics();
-	arithmeticAlphaBlending = true;
+	resetBlendings();
+	blendingAlphaBlending = true;
 	updateParameters();
 }
 
-void ofApp::arithmeticRampImageChanged(bool& show)
+void ofApp::blendingRampImageChanged(bool& show)
 {
-	resetArithmetics();
-	arithmeticRampImage = true;
+	resetBlendings();
+	blendingRampImage = true;
 	updateParameters();
 }
 
-void ofApp::arithmeticRampStartChanged(int& value)
+void ofApp::blendingRampStartChanged(int& value)
 {
 	updateParameters();
 }
 
-void ofApp::arithmeticRampEndChanged(int& value)
+void ofApp::blendingRampEndChanged(int& value)
 {
 	updateParameters();
 }
 
 void ofApp::updateParameters()
 {
-	if (arithmeticAdd) {
-		arithmeticParams.type = kArithmeticAdd;
-	} else if (arithmeticSubtract) {
-		arithmeticParams.type = kArithmeticSubtract;
-	} else if (arithmeticAlphaBlending) {
-		arithmeticParams.type = kArithmeticAlphaBlend;
-		arithmeticParams.alpha = arithmeticAlpha;
-	} else if (arithmeticRampImage) {
-		arithmeticParams.type = kArithmeticRampImage;
-		arithmeticParams.rampStart = arithmeticRampStart;
-		arithmeticParams.rampEnd = arithmeticRampEnd;
+	if (blendingAdd) {
+		blendingParams.type = kArithmeticAdd;
+	} else if (blendingSubtract) {
+		blendingParams.type = kArithmeticSubtract;
+	} else if (blendingAlphaBlending) {
+		blendingParams.type = kArithmeticAlphaBlend;
+		blendingParams.alpha = blendingAlpha;
+	} else if (blendingRampImage) {
+		blendingParams.type = kArithmeticRampImage;
+		blendingParams.rampStart = blendingRampStart;
+		blendingParams.rampEnd = blendingRampEnd;
 	}
 
-	documentList.setArithmeticParams(arithmeticParams);
+	documentList.setBlendingParams(blendingParams);
 	
-	documentList.updateImage(0);
+	documentList.updateImage(UpdateImageType::kUpdateAll);
 }

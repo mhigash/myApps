@@ -11,7 +11,13 @@ enum ArithmeticType
 	kArithmeticRampImage,
 };
 
-struct ArithmeticParams
+enum UpdateImageType
+{
+	kUpdateAll,
+	kUpdateIntersectionOnly,
+};
+
+struct BlendingParams
 {
 	ArithmeticType type;
 	float alpha;
@@ -25,7 +31,7 @@ class ImageDocumentList
 
 	ofRectangle intersect;
 
-	ArithmeticParams arithmeticParams;
+	BlendingParams blendingParams;
 	cv::Mat rampImage1;
 	cv::Mat rampImage2;
 
@@ -54,9 +60,9 @@ public:
 	ImageDocument* hitTest(const ofEasyCam& cam, const ofVec2f& mouse);
 	ImageDocument* getActive(ActiveType active_type);
 
-	ArithmeticParams getArithmeticParams() { return arithmeticParams; }
-	void setArithmeticParams(ArithmeticParams params) { arithmeticParams = params; }
+	BlendingParams getArithmeticParams() { return blendingParams; }
+	void setBlendingParams(BlendingParams params) { blendingParams = params; }
 
-	void updateImage(int updateType);
+	void updateImage(UpdateImageType updateType);
 };
 

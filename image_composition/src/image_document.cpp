@@ -125,8 +125,6 @@ void ImageDocument::test()
 	cv::Mat image_color;
 
     if (image.getImageType() == ofImageType::OF_IMAGE_COLOR) {
-        ofPixels pixels = image.getPixels();
-        pixels.getData();
 		image_color = cv::Mat(image.getHeight(), image.getWidth(), CV_8UC3, image.getPixels().getData());
 		cv::cvtColor(image_color, image_gray, CV_RGB2GRAY);
     } else if (image.getImageType() == ofImageType::OF_IMAGE_GRAYSCALE){

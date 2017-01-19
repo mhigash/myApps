@@ -236,7 +236,7 @@ bool ImageDocument::getSubImageByGlobalPosition(ofRectangle globalRect, ofImage&
 
 	int x = static_cast<int>(left - left2);
 	int y = static_cast<int>(-(top - top2));
-	int w = static_cast<int>(globalRect.getHeight());
+	int w = static_cast<int>(globalRect.getWidth());
 	int h = static_cast<int>(abs(globalRect.getHeight()));
 
     if (w <= 0 || h <= 0)

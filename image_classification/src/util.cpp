@@ -79,12 +79,11 @@ bool LoadCsvAsImage(const string& filepath, char delimiter, cv::Mat& image)
         
         cv::Mat row = cv::Mat(1, static_cast<int>(elements.size()), CV_32F, array);
         
-        if (rows == 0) {
-//            image.release();
-            image = cv::Mat(1, static_cast<int>(elements.size()), CV_32F, array);
-        } else {
+//        if (rows == 0) {
+//            image = cv::Mat(1, static_cast<int>(elements.size()), CV_32F, array);
+//        } else {
             image.push_back(row);
-        }
+        //}
         delete[] array;
         
         rows++;
@@ -92,19 +91,3 @@ bool LoadCsvAsImage(const string& filepath, char delimiter, cv::Mat& image)
     
     return true;
 }
-
-//template <typename T>
-//vector<size_t> ArgSort(const vector<T> &v) {
-//    
-//    // initialize original index locations
-//    vector<size_t> idx(v.size());
-//    
-//    iota(idx.begin(), idx.end(), 0);
-//    
-//    // sort indexes based on comparing values in v
-//    sort(idx.begin(), idx.end(),
-//         [&v](size_t i1, size_t i2) {return v[i1] < v[i2];});
-//    
-//    return idx;
-//}
-

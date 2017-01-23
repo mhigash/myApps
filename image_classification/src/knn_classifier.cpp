@@ -9,42 +9,16 @@
 #include "knn_classifier.hpp"
 #include "util.hpp"
 
-using namespace std;
-
-// https://daisukekobayashi.com/blog/numpy-argsort-in-cpp/
-
-template <typename Sequence, typename BinaryPredicate>
-struct IndexCompareT {
-    IndexCompareT(const Sequence& seq, const BinaryPredicate comp)
-    : seq_(seq), comp_(comp) { }
-    bool operator()(const size_t a, const size_t b) const
-    {
-        return comp_(seq_[a], seq_[b]);
-    }
-    const Sequence seq_;
-    const BinaryPredicate comp_;
-};
-
-template <typename Sequence, typename BinaryPredicate>
-IndexCompareT<Sequence, BinaryPredicate>
-IndexCompare(const Sequence& seq, const BinaryPredicate comp)
+typedef struct _DistanceWithIndex
 {
-    return IndexCompareT<Sequence, BinaryPredicate>(seq, comp);
-}
+	float distance;
+	int index;
+} DistanceWithIndex;
 
-template <typename Sequence, typename BinaryPredicate>
-std::vector<size_t> ArgSort(const Sequence& seq, BinaryPredicate func)
+bool operator<(const DistanceWithIndex& left, const DistanceWithIndex& right)
 {
-    std::vector<size_t> index(seq.size());
-    for (int i = 0; i < index.size(); i++)
-        index[i] = i;
-    
-    std::sort(index.begin(), index.end(), IndexCompare(seq, func));
-    
-    return index;
+	return left.distance < right.distance;
 }
-
-
 
 KnnClassifier::KnnClassifier(int k) {
     k_ = k;
@@ -71,21 +45,24 @@ int KnnClassifier::Classify(const cv::Mat& data) {
     if (data.rows != 1) {
         return 0;
     }
-    
-    vector<float> distances;
-    
-    for (int r = 0; r < samples_.rows; r++) {
-        distances.push_back(EuclidDiatance(samples_.row(r), data));
-    }
-    
-    // argsort
-    vector<size_t> sorted_index = ArgSort(distances, std::less<float>());
+
+	std::vector<DistanceWithIndex> distances;
+
+	for (int r = 0; r < samples_.rows; r++) {
+		DistanceWithIndex distance = {
+			EuclidDiatance(samples_.row(r), data),
+			r
+		};
+
+		distances.push_back(distance);
+	}
+
+	std::sort(distances.begin(), distances.end());
     
     std::map<float, int> votes;
     
     for (int i = 0; i < k_; i++) {
-        int index = static_cast<int>(sorted_index[i]);
-        float label = labels_.at<float>(index, 0);
+        float label = labels_.at<float>(distances[i].index, 0);
         
         if (votes.find(label) == votes.end()) {
             votes[label] = 1;
@@ -95,7 +72,6 @@ int KnnClassifier::Classify(const cv::Mat& data) {
     }
     
     map<float, int>::iterator itr = std::max_element(votes.begin(), votes.end());
-    
     
     return itr->first;
 }

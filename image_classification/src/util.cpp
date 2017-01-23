@@ -8,16 +8,16 @@
 
 #include "util.hpp"
 
-bool loadPoints3(const string& filepath, vector<cv::Vec3f>& pointList)
+bool loadPoints3(const std::string& filepath, std::vector<cv::Vec3f>& pointList)
 {
-    ifstream file(filepath);
+	std::ifstream file(filepath);
     if (!file.is_open())
         return false;
     
     cv::Vec3f v3;
     
     while (!file.eof()) {
-        string val[4];
+		std::string val[4];
         
         file >> val[0];
         file >> val[1];
@@ -33,9 +33,9 @@ bool loadPoints3(const string& filepath, vector<cv::Vec3f>& pointList)
     return true;
 }
 
-vector<string> Split(const string &s, char delim) {
-    vector<string> elems;
-    string item;
+std::vector<std::string> Split(const std::string &s, char delim) {
+	std::vector<std::string> elems;
+	std::string item;
     
     for (char ch: s) {
         if (ch == delim) {
@@ -52,20 +52,20 @@ vector<string> Split(const string &s, char delim) {
     return elems;
 }
 
-bool LoadCsvAsImage(const string& filepath, char delimiter, cv::Mat& image)
+bool LoadCsvAsImage(const std::string& filepath, char delimiter, cv::Mat& image)
 {
-    ifstream file(filepath);
+	std::ifstream file(filepath);
     if (!file.is_open())
         return false;
     
-    vector<string> elements;
+	std::vector<std::string> elements;
     
     int rows = 0;
 //    char delimiter = '\t';
     
     while (!file.eof()) {
-        string line;
-        getline(file, line);
+		std::string line;
+		std::getline(file, line);
         
         if (line.length() < 2)
             continue;
@@ -73,7 +73,7 @@ bool LoadCsvAsImage(const string& filepath, char delimiter, cv::Mat& image)
         elements = Split(line, delimiter);
         
         float* array = new float[elements.size()];
-        for (int i = 0; i < elements.size(); i++) {
+        for (unsigned int i = 0; i < elements.size(); i++) {
             array[i] = atof(elements[i].c_str());
         }
         

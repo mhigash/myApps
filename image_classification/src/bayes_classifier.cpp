@@ -8,8 +8,6 @@
 
 #include "bayes_classifier.hpp"
 
-using namespace std;
-
 //
 // Train on data (2d matrix whose cols means dimention and row means n
 //
@@ -81,26 +79,26 @@ bool BayesClassifier::Train(const cv::Mat& data, const cv::Mat& labels) {
     }
   
     // dump for check.
-    cout << "indices_of_label_ =[";
-    for (map<float, int>::iterator itr = indices_of_label_.begin(); itr != indices_of_label_.end(); itr++) {
-        cout << "  " << itr->first << "," << itr->second << endl;
+    std::cout << "indices_of_label_ =[";
+    for (std::map<float, int>::iterator itr = indices_of_label_.begin(); itr != indices_of_label_.end(); itr++) {
+        std::cout << "  " << itr->first << "," << itr->second << std::endl;
     }
-    cout << "]" << endl;
+    std::cout << "]" << std::endl;
     
-    cout << "labels_ =[";
-    for (vector<float>::iterator itr = labels_.begin(); itr != labels_.end(); itr++) {
-        cout << "  " << *itr << endl;
+    std::cout << "labels_ =[";
+    for (std::vector<float>::iterator itr = labels_.begin(); itr != labels_.end(); itr++) {
+        std::cout << "  " << *itr << std::endl;
     }
-    cout << "]" << endl;
+    std::cout << "]" << std::endl;
     
-    cout << "count =[";
-    for (map<float, int>::iterator itr = count.begin(); itr != count.end(); itr++) {
-        cout << "  " << itr->first << "," << itr->second << endl;
+    std::cout << "count =[";
+    for (std::map<float, int>::iterator itr = count.begin(); itr != count.end(); itr++) {
+        std::cout << "  " << itr->first << "," << itr->second << std::endl;
     }
-    cout << "]" << endl;
+    std::cout << "]" << std::endl;
     
-    cout << "means =" << means_ << endl;
-    cout << "vars =" << vars_ << endl;
+    std::cout << "means =" << means_ << std::endl;
+    std::cout << "vars =" << vars_ << std::endl;
     
     return true;
 }
@@ -148,8 +146,8 @@ int BayesClassifier::Classify(const cv::Mat& data) {
     // "indices_of_label_" is a map whose key is label and value is index
     int estimated_label = labels_[arg_max];
     
-//    cout << "arg_max = " << arg_max << endl;
-//    cout << "est_label = " << estimated_label << endl;
+//    std::cout << "arg_max = " << arg_max << std::endl;
+//    std::cout << "est_label = " << estimated_label << std::endl;
     
     return estimated_label;
 }
@@ -198,7 +196,7 @@ float BayesClassifier::Gauss(const cv::Mat mean, const cv::Mat& var, const cv::M
     const float pi = 3.14159265358979f;
     
     float gauss = y * pow(2 * pi, -d / 2.0f) / (sqrt(prod_v) + 1e-6);
-//    cout << "S =" << S << endl;
-//    cout << "x =" << x << endl;
+//    std::cout << "S =" << S << std::endl;
+//    std::cout << "x =" << x << std::endl;
     return gauss;
 }

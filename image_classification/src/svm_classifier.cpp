@@ -9,8 +9,6 @@
 #include "svm.h"
 #include "svm_classifier.hpp"
 
-using namespace std;
-
 SvmClassifier::SvmClassifier() {
 
 }

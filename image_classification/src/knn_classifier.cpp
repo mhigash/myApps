@@ -71,7 +71,7 @@ int KnnClassifier::Classify(const cv::Mat& data) {
         }
     }
     
-    map<float, int>::iterator itr = std::max_element(votes.begin(), votes.end());
+    std::map<float, int>::iterator itr = std::max_element(votes.begin(), votes.end());
     
     return itr->first;
 }

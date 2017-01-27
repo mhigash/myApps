@@ -52,20 +52,20 @@
     <ClCompile Include="..\..\..\addons\ofxOpenCv\src\ofxCvShortImage.cpp">
       <Filter>addons\ofxOpenCv\src</Filter>
     </ClCompile>
-    <ClCompile Include="src\bayes_classifier.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\knn_classifier.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="src\svm_classifier.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\util.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="svm\svm.cpp">
       <Filter>svm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\classifier\bayes_classifier.cpp">
+      <Filter>classifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\classifier\knn_classifier.cpp">
+      <Filter>classifier</Filter>
+    </ClCompile>
+    <ClCompile Include="..\classifier\svm_classifier.cpp">
+      <Filter>classifier</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +143,9 @@
     </Filter>
     <Filter Include="svm">
       <UniqueIdentifier>{c9a1c59f-3c6d-40bc-bc99-4fccbd6543cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classifier">
+      <UniqueIdentifier>{39d7cdcb-068f-418a-a215-e3366fe604c2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -452,23 +455,23 @@
     <ClInclude Include="..\..\..\addons\ofxOpenCv\libs\opencv\include\opencv2\video\video.hpp">
       <Filter>addons\ofxOpenCv\libs\opencv\include\opencv2\video</Filter>
     </ClInclude>
-    <ClInclude Include="src\bayes_classifier.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\classifier.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\knn_classifier.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="src\svm_classifier.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="src\util.hpp">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="svm\svm.h">
       <Filter>svm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\classifier\bayes_classifier.hpp">
+      <Filter>classifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\classifier\classifier.h">
+      <Filter>classifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\classifier\knn_classifier.hpp">
+      <Filter>classifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\classifier\svm_classifier.hpp">
+      <Filter>classifier</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

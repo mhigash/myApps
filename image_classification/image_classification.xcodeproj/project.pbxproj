@@ -17,10 +17,10 @@
 		837220E80EB56CD44AD27F2A /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 15F2C6477A769C03A56D1401 /* ofxSlider.cpp */; };
 		856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9604B925D32EE39065747725 /* ofxBaseGui.cpp */; };
 		944B163D1DFCF52F001C5B7B /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 944B163B1DFCF52F001C5B7B /* util.cpp */; };
-		944B16401DFD0AF2001C5B7B /* knn_classifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 944B163E1DFD0AF2001C5B7B /* knn_classifier.cpp */; };
-		9481E3BE1E02B4FD0092A44B /* bayes_classifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9481E3BC1E02B4FD0092A44B /* bayes_classifier.cpp */; };
 		949EA7291E093B0E00778F6D /* svm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 949EA7281E093B0E00778F6D /* svm.cpp */; };
-		94A440991E07FBF400F0AE01 /* svm_classifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94A440971E07FBF400F0AE01 /* svm_classifier.cpp */; };
+		94CDD9D81E3ACF3B00D373EA /* bayes_classifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94CDD9D11E3ACF3B00D373EA /* bayes_classifier.cpp */; };
+		94CDD9D91E3ACF3B00D373EA /* knn_classifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94CDD9D41E3ACF3B00D373EA /* knn_classifier.cpp */; };
+		94CDD9DA1E3ACF3B00D373EA /* svm_classifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 94CDD9D61E3ACF3B00D373EA /* svm_classifier.cpp */; };
 		B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ECF8674C7975F1063C5E30CA /* ofxGuiGroup.cpp */; };
 		B56FE57CC35806596D38118C /* ofxSliderGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 802251BAF1B35B1D67B32FD0 /* ofxSliderGroup.cpp */; };
 		D3301F6A0B43BB293ED97C1D /* ofxCvShortImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8A4DD23693DFAB8EC05FAA5D /* ofxCvShortImage.cpp */; };
@@ -159,15 +159,15 @@
 		907C5B5E104864A2D3A25745 /* ofxToggle.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxToggle.cpp; path = ../../../addons/ofxGui/src/ofxToggle.cpp; sourceTree = SOURCE_ROOT; };
 		944B163B1DFCF52F001C5B7B /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = util.cpp; sourceTree = "<group>"; };
 		944B163C1DFCF52F001C5B7B /* util.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = util.hpp; sourceTree = "<group>"; };
-		944B163E1DFD0AF2001C5B7B /* knn_classifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = knn_classifier.cpp; sourceTree = "<group>"; };
-		944B163F1DFD0AF2001C5B7B /* knn_classifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = knn_classifier.hpp; sourceTree = "<group>"; };
 		946187321200AC04E570E6EC /* hierarchical_clustering_index.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = hierarchical_clustering_index.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/hierarchical_clustering_index.h; sourceTree = SOURCE_ROOT; };
-		9481E3BC1E02B4FD0092A44B /* bayes_classifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bayes_classifier.cpp; sourceTree = "<group>"; };
-		9481E3BD1E02B4FD0092A44B /* bayes_classifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bayes_classifier.hpp; sourceTree = "<group>"; };
-		9481E3BF1E02B5210092A44B /* classifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = classifier.h; sourceTree = "<group>"; };
 		949EA7281E093B0E00778F6D /* svm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svm.cpp; path = "../../../../../../libsvm-3.21/svm.cpp"; sourceTree = "<group>"; };
-		94A440971E07FBF400F0AE01 /* svm_classifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = svm_classifier.cpp; sourceTree = "<group>"; };
-		94A440981E07FBF400F0AE01 /* svm_classifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = svm_classifier.hpp; sourceTree = "<group>"; };
+		94CDD9D11E3ACF3B00D373EA /* bayes_classifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bayes_classifier.cpp; path = ../classifier/bayes_classifier.cpp; sourceTree = "<group>"; };
+		94CDD9D21E3ACF3B00D373EA /* bayes_classifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = bayes_classifier.hpp; path = ../classifier/bayes_classifier.hpp; sourceTree = "<group>"; };
+		94CDD9D31E3ACF3B00D373EA /* classifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = classifier.h; path = ../classifier/classifier.h; sourceTree = "<group>"; };
+		94CDD9D41E3ACF3B00D373EA /* knn_classifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = knn_classifier.cpp; path = ../classifier/knn_classifier.cpp; sourceTree = "<group>"; };
+		94CDD9D51E3ACF3B00D373EA /* knn_classifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = knn_classifier.hpp; path = ../classifier/knn_classifier.hpp; sourceTree = "<group>"; };
+		94CDD9D61E3ACF3B00D373EA /* svm_classifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svm_classifier.cpp; path = ../classifier/svm_classifier.cpp; sourceTree = "<group>"; };
+		94CDD9D71E3ACF3B00D373EA /* svm_classifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = svm_classifier.hpp; path = ../classifier/svm_classifier.hpp; sourceTree = "<group>"; };
 		9604B925D32EE39065747725 /* ofxBaseGui.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxBaseGui.cpp; path = ../../../addons/ofxGui/src/ofxBaseGui.cpp; sourceTree = SOURCE_ROOT; };
 		960BD311ABBA7D3299D7FE1F /* datamov_utils.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = datamov_utils.hpp; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/gpu/device/datamov_utils.hpp; sourceTree = SOURCE_ROOT; };
 		974AACF856A0A1B7D8F259E0 /* result_set.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = result_set.h; path = ../../../addons/ofxOpenCv/libs/opencv/include/opencv2/flann/result_set.h; sourceTree = SOURCE_ROOT; };
@@ -516,6 +516,20 @@
 			name = features2d;
 			sourceTree = "<group>";
 		};
+		94CDD9D01E3ACF1000D373EA /* classifier */ = {
+			isa = PBXGroup;
+			children = (
+				94CDD9D11E3ACF3B00D373EA /* bayes_classifier.cpp */,
+				94CDD9D21E3ACF3B00D373EA /* bayes_classifier.hpp */,
+				94CDD9D31E3ACF3B00D373EA /* classifier.h */,
+				94CDD9D41E3ACF3B00D373EA /* knn_classifier.cpp */,
+				94CDD9D51E3ACF3B00D373EA /* knn_classifier.hpp */,
+				94CDD9D61E3ACF3B00D373EA /* svm_classifier.cpp */,
+				94CDD9D71E3ACF3B00D373EA /* svm_classifier.hpp */,
+			);
+			name = classifier;
+			sourceTree = "<group>";
+		};
 		961A625BD21068033782887C /* legacy */ = {
 			isa = PBXGroup;
 			children = (
@@ -727,6 +741,7 @@
 		E4B69B4A0A3A1720003C02F2 = {
 			isa = PBXGroup;
 			children = (
+				94CDD9D01E3ACF1000D373EA /* classifier */,
 				E4B6FCAD0C3E899E008CF71C /* openFrameworks-Info.plist */,
 				E4EB6923138AFD0F00A09F29 /* Project.xcconfig */,
 				E4B69E1C0A3A1BDC003C02F2 /* src */,
@@ -741,18 +756,11 @@
 			isa = PBXGroup;
 			children = (
 				949EA7281E093B0E00778F6D /* svm.cpp */,
-				94A440971E07FBF400F0AE01 /* svm_classifier.cpp */,
-				94A440981E07FBF400F0AE01 /* svm_classifier.hpp */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
-				944B163E1DFD0AF2001C5B7B /* knn_classifier.cpp */,
-				944B163F1DFD0AF2001C5B7B /* knn_classifier.hpp */,
 				944B163B1DFCF52F001C5B7B /* util.cpp */,
 				944B163C1DFCF52F001C5B7B /* util.hpp */,
-				9481E3BC1E02B4FD0092A44B /* bayes_classifier.cpp */,
-				9481E3BD1E02B4FD0092A44B /* bayes_classifier.hpp */,
-				9481E3BF1E02B5210092A44B /* classifier.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -871,13 +879,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				944B16401DFD0AF2001C5B7B /* knn_classifier.cpp in Sources */,
+				94CDD9D91E3ACF3B00D373EA /* knn_classifier.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
-				9481E3BE1E02B4FD0092A44B /* bayes_classifier.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				856AA354D08AB4B323081444 /* ofxBaseGui.cpp in Sources */,
 				5CBB2AB3A60F65431D7B555D /* ofxButton.cpp in Sources */,
 				B266578FC55D23BFEBC042E7 /* ofxGuiGroup.cpp in Sources */,
+				94CDD9D81E3ACF3B00D373EA /* bayes_classifier.cpp in Sources */,
 				483908258D00B98B4BE69F07 /* ofxLabel.cpp in Sources */,
 				949EA7291E093B0E00778F6D /* svm.cpp in Sources */,
 				F285EB3169F1566CA3D93C20 /* ofxPanel.cpp in Sources */,
@@ -886,7 +894,7 @@
 				1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */,
 				250A95BA26587BE85DB0A353 /* ofxCvColorImage.cpp in Sources */,
 				944B163D1DFCF52F001C5B7B /* util.cpp in Sources */,
-				94A440991E07FBF400F0AE01 /* svm_classifier.cpp in Sources */,
+				94CDD9DA1E3ACF3B00D373EA /* svm_classifier.cpp in Sources */,
 				1D5F3298C2FA073628012944 /* ofxCvContourFinder.cpp in Sources */,
 				169D3C72FDE6C5590A1616F5 /* ofxCvFloatImage.cpp in Sources */,
 				FB09C6B2A1DA0EA217240CB8 /* ofxCvGrayscaleImage.cpp in Sources */,

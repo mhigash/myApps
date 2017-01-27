@@ -59,7 +59,9 @@ void ofApp::setup() {
 
 bool ofApp::LoadData(const std::string& filepath) {
     
-    LoadCsvAsImage(filepath, '\t', image_);
+    // clear the image because it is reused.
+    image_.release();
+    if (!LoadCsvAsImage(filepath, '\t', image_)) return false;
     
     double min_val, max_val;
     cv::minMaxLoc(image_.col(0), &min_val, &max_val);

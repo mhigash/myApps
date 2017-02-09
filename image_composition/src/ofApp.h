@@ -28,7 +28,15 @@ private:
 	ImageDocumentList documentList;
 	ofEasyCam cam;
 	
-	ofxGuiGroup blendingGui;
+    ofxGuiGroup typeGui;
+    ofParameter<bool> typeBlending;
+    ofParameter<bool> typeCutting;
+    
+    void resetTypes();
+    void typeBlendingChanged(bool& show);
+    void typeCuttingChanged(bool& show);
+    
+    ofxGuiGroup blendingGui;
 	ofParameter<bool> blendingAdd;
 	ofParameter<bool> blendingSubtract;
 	ofParameter<bool> blendingAlphaBlending;
@@ -47,7 +55,9 @@ private:
 	void blendingRampStartChanged(int& value);
 	void blendingRampEndChanged(int& value);
 	
-	ofxPanel gui;
+    ofxGuiGroup cuttingGui;
+    
+    ofxPanel gui;
 
 	int lastX;
 	int lastY;

@@ -9,25 +9,42 @@ void ofApp::setup(){
 	ofSetVerticalSync(true);
 
 	gui.setup();
-
-	blendingGui.setup();
+    
+    typeGui.setup();
+    typeGui.setName("type");
+    typeGui.add(typeBlending.set("blending", false, false, true));
+    typeGui.add(typeCutting.set("cutting", false, false, true));
+    
+    typeBlending.addListener(this, &ofApp::typeBlendingChanged);
+    typeCutting.addListener(this, &ofApp::typeCuttingChanged);
+    resetTypes();
+    typeBlending = true;
+    
+    gui.add(&typeGui);
+    
+    blendingGui.setup();
 	blendingGui.setName("blending");
 	blendingGui.add(blendingAdd.set("add", false, false, true));
 	blendingGui.add(blendingSubtract.set("subtract", false, false, true));
-	blendingGui.add(blendingAlphaBlending.set("alpha", false, false, true));
+	blendingGui.add(blendingAlphaBlending.set("alpha blending", false, false, true));
 	blendingGui.add(blendingAlpha.setup("alpha", 0.5, 0.0, 1.0));
 	blendingGui.add(blendingRampImage.set("ramp image", false, false, true));
 	blendingGui.add(blendingRampStart.setup("ramp start", 33, 0, 100));
 	blendingGui.add(blendingRampEnd.setup("ramp end", 66, 0, 100));
-	blendingRampStart.addListener(this, &ofApp::blendingRampStartChanged);
-	blendingRampEnd.addListener(this, &ofApp::blendingRampEndChanged);
-	resetBlendings();
+	
+    blendingRampStart.addListener(this, &ofApp::blendingRampStartChanged);
+	blendingRampEnd.addListener(this, &ofApp::blendingRampEndChanged);	
+    resetBlendings();
 	blendingAlphaBlending = true;
 
 	gui.add(&blendingGui);
 
+    cuttingGui.setup();
+    cuttingGui.setName("cutting");
 
-	// this uses depth information for occlusion
+    gui.add(&cuttingGui);
+    
+    // this uses depth information for occlusion
 	// rather than always drawing things on top of each other
 	ofEnableDepthTest();
 	
@@ -227,6 +244,31 @@ void ofApp::gotMessage(ofMessage msg){
 //--------------------------------------------------------------
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
+}
+
+void ofApp::resetTypes() {
+    typeBlending.removeListener(this, &ofApp::typeBlendingChanged);
+    typeCutting.removeListener(this, &ofApp::typeCuttingChanged);
+    
+    typeBlending = false;
+    typeCutting = false;
+    
+    typeBlending.addListener(this, &ofApp::typeBlendingChanged);
+    typeCutting.addListener(this, &ofApp::typeCuttingChanged);
+}
+
+void ofApp::typeBlendingChanged(bool& show)
+{
+    resetTypes();
+    typeBlending = true;
+    documentList.set_processing_type(kBlending);
+}
+
+void ofApp::typeCuttingChanged(bool& show)
+{
+    resetTypes();
+    typeCutting = true;
+    documentList.set_processing_type(kCutting);
 }
 
 void ofApp::resetBlendings()

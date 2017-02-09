@@ -163,6 +163,7 @@ void ImageDocumentList::drawInfo()
 		intersect.getBottom());
 	ofDrawBitmapString(info, 15, 15 * row, 0);
 
+    /*
 	ofSetColor(255);
 
 	if (imageDoc1)
@@ -189,6 +190,7 @@ void ImageDocumentList::drawInfo()
 		subImage2.draw(15 + 100 + 5, 15 * row, 100, 100);
 		//subImage1.saveImage("intersect.bmp", ofImageQualityType::OF_IMAGE_QUALITY_MEDIUM);
 	}
+    */
 }
 
 bool ImageDocumentList::loadImage(const std::string& filename)
@@ -418,6 +420,26 @@ void ImageDocumentList::updateImage(UpdateImageType updateType)
 	}
 
 	cv::Mat dst;
+    
+    if (processing_type_ == kBlending)
+        drawForBlending(src1, src2, dst);
+    else if (processing_type_ == kCutting)
+        drawForCutting(src1, src2, dst);
+
+    if (subImage1.getImageType() == ofImageType::OF_IMAGE_COLOR)
+	{
+		subImage1.setFromPixels(dst.data, dst.cols, dst.rows, ofImageType::OF_IMAGE_COLOR);
+	}
+	else
+	{
+        subImage1.setFromPixels(dst.data, dst.cols, dst.rows, ofImageType::OF_IMAGE_GRAYSCALE);
+	}
+
+	intersectImage = subImage1;
+}
+
+void ImageDocumentList::drawForBlending(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
+{
 	if (blendingParams.type == kArithmeticAdd)
 	{
 		dst = src1 + src2;
@@ -512,15 +534,48 @@ void ImageDocumentList::updateImage(UpdateImageType updateType)
 		}
 
 	}
+}
 
-    if (subImage1.getImageType() == ofImageType::OF_IMAGE_COLOR)
-	{
-		subImage1.setFromPixels(dst.data, dst.cols, dst.rows, ofImageType::OF_IMAGE_COLOR);
-	}
-	else
-	{
-		subImage1.setFromPixels(dst.data, dst.cols, dst.rows, ofImageType::OF_IMAGE_GRAYSCALE);
-	}
+void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
+{
+    dst = src1 - src2;
 
-	intersectImage = subImage1;
+    cv::Mat src1_gray = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
+    cv::Mat src2_gray = cv::Mat::zeros(src2.rows, src2.cols, CV_8U);
+    cv::Mat dst_gray = cv::Mat::zeros(dst.rows, dst.cols, CV_32F);
+    
+    cv::cvtColor(src1, src1_gray, CV_RGB2GRAY);
+    cv::cvtColor(src2, src2_gray, CV_RGB2GRAY);
+    dst_gray = src1_gray - src2_gray;
+    cv::multiply(dst_gray, dst_gray, dst_gray);
+    
+    std::vector<cv::Point> min_points;
+    
+    for (int r = 0; r < dst_gray.rows; r++) {
+        double min_val, max_val;
+        cv::Point min_loc, max_loc;
+        cv::Mat row = dst_gray.row(r);
+        cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
+        
+        min_points.push_back(cv::Point(min_loc.x, r));
+    }
+    
+    int count = 0;
+    cv::Point pt1, pt2;
+    cv::Scalar color(255, 255, 255);
+    std::vector<cv::Point>::iterator itr;
+    
+    for (itr = min_points.begin(); itr != min_points.end(); itr++) {
+        if (count == 0) {
+            pt1 = *itr;
+            count++;
+            continue;
+        }
+        
+        pt2 = *itr;
+        cv::line(dst, pt1, pt2, color);
+        pt1 = pt2;
+        count++;
+    }
+
 }

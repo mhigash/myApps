@@ -538,16 +538,30 @@ void ImageDocumentList::drawForBlending(const cv::Mat &src1, const cv::Mat &src2
 
 void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
 {
-    dst = src1 - src2;
-
+//    dst = src1 - src2;
     cv::Mat src1_gray = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
     cv::Mat src2_gray = cv::Mat::zeros(src2.rows, src2.cols, CV_8U);
-    cv::Mat dst_gray = cv::Mat::zeros(dst.rows, dst.cols, CV_32F);
+    cv::Mat dst_gray = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
     
-    cv::cvtColor(src1, src1_gray, CV_RGB2GRAY);
-    cv::cvtColor(src2, src2_gray, CV_RGB2GRAY);
-    dst_gray = src1_gray - src2_gray;
+#if 0
+    cv::cvtColor(src1, src1_gray, CV_BGR2GRAY);
+    cv::cvtColor(src2, src2_gray, CV_BGR2GRAY);
+
+    //dst_gray = src1_gray - src2_gray;
+    cv::subtract(src1_gray, src2_gray, dst_gray);
     cv::multiply(dst_gray, dst_gray, dst_gray);
+#else
+    for (int r = 0; r < src1.rows; r++)
+    {
+        for (int c = 0; c < src1.cols; c++)
+        {
+            cv::Vec3b pixel1 = src1.at<cv::Vec3b>(r, c);
+            cv::Vec3b pixel2 = src2.at<cv::Vec3b>(r, c);
+            dst_gray.at<uchar>(r, c) = pixel1.val[0] - pixel2.val[0];
+        }
+    }
+#endif
+    //std::cout << "gray.channels: " << src1_gray.channels() << std::endl;
     
     std::vector<cv::Point> min_points;
     
@@ -561,11 +575,26 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
     }
     
     int count = 0;
-    cv::Point pt1, pt2;
+    cv::Point pt0, pt1, pt2;
     cv::Scalar color(255, 255, 255);
-    std::vector<cv::Point>::iterator itr;
+    cv::Mat mask = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
     
+    std::vector<cv::Point>::iterator itr;
     for (itr = min_points.begin(); itr != min_points.end(); itr++) {
+        pt0 = pt1 = *itr;
+        pt0.x = 0;
+        cv::line(mask, pt0, pt1, color);
+    }
+    
+//    src1.copyTo(dst, mask);
+//    cv::bitwise_not(mask, mask);
+//    //mask = !mask;
+//    src2.copyTo(dst, mask);
+
+    dst = dst_gray;
+#if 0
+    for (itr = min_points.begin(); itr != min_points.end(); itr++) {
+
         if (count == 0) {
             pt1 = *itr;
             count++;
@@ -573,9 +602,11 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
         }
         
         pt2 = *itr;
+        //color[0] = 0;
         cv::line(dst, pt1, pt2, color);
         pt1 = pt2;
         count++;
     }
+#endif
 
 }

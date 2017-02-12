@@ -261,14 +261,14 @@ void ofApp::typeBlendingChanged(bool& show)
 {
     resetTypes();
     typeBlending = true;
-    documentList.set_processing_type(kBlending);
+    updateParameters();
 }
 
 void ofApp::typeCuttingChanged(bool& show)
 {
     resetTypes();
     typeCutting = true;
-    documentList.set_processing_type(kCutting);
+    updateParameters();
 }
 
 void ofApp::resetBlendings()
@@ -329,6 +329,11 @@ void ofApp::blendingRampEndChanged(int& value)
 
 void ofApp::updateParameters()
 {
+    if (typeBlending)
+        documentList.set_processing_type(kBlending);
+    else if (typeCutting)
+        documentList.set_processing_type(kCutting);
+    
 	if (blendingAdd) {
 		blendingParams.type = kArithmeticAdd;
 	} else if (blendingSubtract) {

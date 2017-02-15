@@ -536,45 +536,109 @@ void ImageDocumentList::drawForBlending(const cv::Mat &src1, const cv::Mat &src2
 	}
 }
 
+template <class T>
+struct ValueIndex
+{
+	T value;
+	int index;
+};
+
+template <class T>
+bool operator<(const ValueIndex<T>& left, const ValueIndex<T>& right)
+{
+	return left.value < right.value;
+}
+
 void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2, cv::Mat &dst)
 {
-//    dst = src1 - src2;
-    cv::Mat src1_gray = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
-    cv::Mat src2_gray = cv::Mat::zeros(src2.rows, src2.cols, CV_8U);
-    cv::Mat dst_gray = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
-    
-#if 0
+	cv::Mat src1_gray;
+	cv::Mat src2_gray;
+	cv::Mat src1_grayf;
+	cv::Mat src2_grayf;
+	cv::Mat diff;
+
     cv::cvtColor(src1, src1_gray, CV_BGR2GRAY);
     cv::cvtColor(src2, src2_gray, CV_BGR2GRAY);
+	// need to be float to calculate negative value.
+	src1_gray.convertTo(src1_grayf, CV_32F);
+	src2_gray.convertTo(src2_grayf, CV_32F);
 
-    //dst_gray = src1_gray - src2_gray;
-    cv::subtract(src1_gray, src2_gray, dst_gray);
-    cv::multiply(dst_gray, dst_gray, dst_gray);
+	//diff = src1_gray - src2_gray;
+    cv::subtract(src1_grayf, src2_grayf, diff);
+    cv::multiply(diff, diff, diff);
+	//ofstream dump1("src1-gray.csv");
+	//ofstream dump2("src2-gray.csv");
+	//ofstream dump3("diff.csv");
+	//dump1 << src1_gray << std::endl;
+	//dump2 << src2_gray << std::endl;
+	//dump3 << diff << std::endl;
+	
+	cv::Mat error = diff.clone();
+	std::vector<cv::Point> min_points;
+
+	// This is the way described in the paper
+	// "Image Quilting for Texture Synthesis and Transfer"
+	// My implementation is missing something and it doesn't work as described.
+	//
+#if 1
+    for (int r = 1; r < diff.rows; r++) {
+		for (int c = 1; c < diff.cols - 1; c++) {
+			float e1 = error.at<float>(r - 1, c - 1);
+			float e2 = error.at<float>(r - 1, c);
+			float e3 = error.at<float>(r - 1, c + 1);
+			float min_val = std::min(std::min(e1, e2), e3);
+			error.at<float>(r, c) = diff.at<float>(r, c) + min_val;
+		}
+	}
+
+	for (int r = 0; r < error.rows; r++) {
+		double min_val, max_val;
+		cv::Point min_loc, max_loc;
+		cv::Mat row = error.row(r);
+		cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
+		min_points.push_back(cv::Point(min_loc.x, r));
+	}
+		
 #else
-    for (int r = 0; r < src1.rows; r++)
-    {
-        for (int c = 0; c < src1.cols; c++)
-        {
-            cv::Vec3b pixel1 = src1.at<cv::Vec3b>(r, c);
-            cv::Vec3b pixel2 = src2.at<cv::Vec3b>(r, c);
-            dst_gray.at<uchar>(r, c) = pixel1.val[0] - pixel2.val[0];
-        }
-    }
+	cv::Point last_min;
+
+    for (int r = 0; r < error.rows; r++) {
+		if (r == 0) {
+			double min_val, max_val;
+			cv::Point min_loc, max_loc;
+			cv::Mat row = error.row(r);
+			cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
+			last_min = cv::Point(min_loc.x, r);
+		} else {
+			std::vector<ValueIndex<float> > error_values;
+
+			const int kRange = 1;
+
+			for (int i = -kRange; i <= kRange; i++) {
+				ValueIndex<float> e;
+				int c = last_min.x + i;
+				c = std::max(c, 0);
+				c = std::min(c, error.cols - 1);
+				e.value = error.at<float>(r, c);
+				e.index = c;
+				error_values.push_back(e);
+			}
+
+			std::sort(error_values.begin(), error_values.end());
+
+			last_min.x = error_values[0].index;
+			last_min.y = r;
+		}
+
+		last_min.x = std::max(last_min.x, 1);
+		last_min.x = std::min(last_min.x, error.cols - 2);
+
+		min_points.push_back(last_min);
+	}
 #endif
-    //std::cout << "gray.channels: " << src1_gray.channels() << std::endl;
     
-    std::vector<cv::Point> min_points;
-    
-    for (int r = 0; r < dst_gray.rows; r++) {
-        double min_val, max_val;
-        cv::Point min_loc, max_loc;
-        cv::Mat row = dst_gray.row(r);
-        cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
-        
-        min_points.push_back(cv::Point(min_loc.x, r));
-    }
-    
-    int count = 0;
+	// Make overlayed image from 2 images
+	int count = 0;
     cv::Point pt0, pt1, pt2;
     cv::Scalar color(255, 255, 255);
     cv::Mat mask = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
@@ -586,15 +650,12 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
         cv::line(mask, pt0, pt1, color);
     }
     
-//    src1.copyTo(dst, mask);
-//    cv::bitwise_not(mask, mask);
-//    //mask = !mask;
-//    src2.copyTo(dst, mask);
+    src1.copyTo(dst, mask);
+    cv::bitwise_not(mask, mask);
+    src2.copyTo(dst, mask);
 
-    dst = dst_gray;
 #if 0
     for (itr = min_points.begin(); itr != min_points.end(); itr++) {
-
         if (count == 0) {
             pt1 = *itr;
             count++;
@@ -602,7 +663,6 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
         }
         
         pt2 = *itr;
-        //color[0] = 0;
         cv::line(dst, pt1, pt2, color);
         pt1 = pt2;
         count++;

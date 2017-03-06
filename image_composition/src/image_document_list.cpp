@@ -421,9 +421,9 @@ void ImageDocumentList::updateImage(UpdateImageType updateType)
 
 	cv::Mat dst;
     
-    if (processing_type_ == kBlending)
+    if (processingType == kBlending)
         drawForBlending(src1, src2, dst);
-    else if (processing_type_ == kCutting)
+    else if (processingType == kCutting)
         drawForCutting(src1, src2, dst);
 
     if (subImage1.getImageType() == ofImageType::OF_IMAGE_COLOR)
@@ -580,65 +580,63 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	// "Image Quilting for Texture Synthesis and Transfer"
 	// My implementation is missing something and it doesn't work as described.
 	//
-#if 1
-    for (int r = 1; r < diff.rows; r++) {
-		for (int c = 1; c < diff.cols - 1; c++) {
-			float e1 = error.at<float>(r - 1, c - 1);
-			float e2 = error.at<float>(r - 1, c);
-			float e3 = error.at<float>(r - 1, c + 1);
-			float min_val = std::min(std::min(e1, e2), e3);
-			error.at<float>(r, c) = diff.at<float>(r, c) + min_val;
-		}
+    if (cuttingParams.type == kCutting1) {
+        for (int r = 1; r < diff.rows; r++) {
+            for (int c = 1; c < diff.cols - 1; c++) {
+                float e1 = error.at<float>(r - 1, c - 1);
+                float e2 = error.at<float>(r - 1, c);
+                float e3 = error.at<float>(r - 1, c + 1);
+                float min_val = std::min(std::min(e1, e2), e3);
+                error.at<float>(r, c) = diff.at<float>(r, c) + min_val;
+            }
+        }
+
+        for (int r = 0; r < error.rows; r++) {
+            double min_val, max_val;
+            cv::Point min_loc, max_loc;
+            cv::Mat row = error.row(r);
+            cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
+            min_points.push_back(cv::Point(min_loc.x, r));
+        }
+    } else if (cuttingParams.type == kCutting2) {
+        cv::Point last_min;
+
+        for (int r = 0; r < error.rows; r++) {
+            if (r == 0) {
+                double min_val, max_val;
+                cv::Point min_loc, max_loc;
+                cv::Mat row = error.row(r);
+                cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
+                last_min = cv::Point(min_loc.x, r);
+            } else {
+                std::vector<ValueIndex<float> > error_values;
+
+                int range = cuttingParams.range;
+
+                for (int i = -range; i <= range; i++) {
+                    ValueIndex<float> e;
+                    int c = last_min.x + i;
+                    c = std::max(c, 0);
+                    c = std::min(c, error.cols - 1);
+                    e.value = error.at<float>(r, c);
+                    e.index = c;
+                    error_values.push_back(e);
+                }
+
+                std::sort(error_values.begin(), error_values.end());
+
+                last_min.x = error_values[0].index;
+                last_min.y = r;
+            }
+
+            last_min.x = std::max(last_min.x, 1);
+            last_min.x = std::min(last_min.x, error.cols - 2);
+
+            min_points.push_back(last_min);
+        }
 	}
-
-	for (int r = 0; r < error.rows; r++) {
-		double min_val, max_val;
-		cv::Point min_loc, max_loc;
-		cv::Mat row = error.row(r);
-		cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
-		min_points.push_back(cv::Point(min_loc.x, r));
-	}
-		
-#else
-	cv::Point last_min;
-
-    for (int r = 0; r < error.rows; r++) {
-		if (r == 0) {
-			double min_val, max_val;
-			cv::Point min_loc, max_loc;
-			cv::Mat row = error.row(r);
-			cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
-			last_min = cv::Point(min_loc.x, r);
-		} else {
-			std::vector<ValueIndex<float> > error_values;
-
-			const int kRange = 1;
-
-			for (int i = -kRange; i <= kRange; i++) {
-				ValueIndex<float> e;
-				int c = last_min.x + i;
-				c = std::max(c, 0);
-				c = std::min(c, error.cols - 1);
-				e.value = error.at<float>(r, c);
-				e.index = c;
-				error_values.push_back(e);
-			}
-
-			std::sort(error_values.begin(), error_values.end());
-
-			last_min.x = error_values[0].index;
-			last_min.y = r;
-		}
-
-		last_min.x = std::max(last_min.x, 1);
-		last_min.x = std::min(last_min.x, error.cols - 2);
-
-		min_points.push_back(last_min);
-	}
-#endif
     
 	// Make overlayed image from 2 images
-	int count = 0;
     cv::Point pt0, pt1, pt2;
     cv::Scalar color(255, 255, 255);
     cv::Mat mask = cv::Mat::zeros(src1.rows, src1.cols, CV_8U);
@@ -654,19 +652,21 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
     cv::bitwise_not(mask, mask);
     src2.copyTo(dst, mask);
 
-#if 0
-    for (itr = min_points.begin(); itr != min_points.end(); itr++) {
-        if (count == 0) {
-            pt1 = *itr;
-            count++;
-            continue;
-        }
+    if (cuttingParams.showLines) {
+        int count = 0;
+        pt1.x = pt1.y = 0;
         
-        pt2 = *itr;
-        cv::line(dst, pt1, pt2, color);
-        pt1 = pt2;
-        count++;
+        for (itr = min_points.begin(); itr != min_points.end(); itr++) {
+            if (count == 0) {
+               
+                count++;
+                continue;
+            }
+            
+            pt2 = *itr;
+            cv::line(dst, pt1, pt2, color);
+            pt1 = pt2;
+            count++;
+        }
     }
-#endif
-
 }

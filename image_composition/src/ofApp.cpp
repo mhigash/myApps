@@ -41,6 +41,15 @@ void ofApp::setup(){
 
     cuttingGui.setup();
     cuttingGui.setName("cutting");
+    cuttingGui.add(cuttingShowLines.set("show lines", false, false, true));
+    cuttingGui.add(cuttingType1.set("type1", false, false, true));
+    cuttingGui.add(cuttingType2.set("type2", false, false, true));
+    cuttingGui.add(cuttingRange.setup("range", 5, 1, 10));
+
+    cuttingShowLines.addListener(this, &ofApp::cuttingShowLinesChanged);
+    cuttingRange.addListener(this, &ofApp::cuttingRangeChanged);
+    resetCuttings();
+    cuttingType1 = true;
 
     gui.add(&cuttingGui);
     
@@ -330,9 +339,9 @@ void ofApp::blendingRampEndChanged(int& value)
 void ofApp::updateParameters()
 {
     if (typeBlending)
-        documentList.set_processing_type(kBlending);
+        documentList.setProcessingType(kBlending);
     else if (typeCutting)
-        documentList.set_processing_type(kCutting);
+        documentList.setProcessingType(kCutting);
     
 	if (blendingAdd) {
 		blendingParams.type = kArithmeticAdd;
@@ -347,7 +356,53 @@ void ofApp::updateParameters()
 		blendingParams.rampEnd = blendingRampEnd;
 	}
 
-	documentList.setBlendingParams(blendingParams);
-	
+    if (cuttingType1) {
+        cuttingParams.type = kCutting1;
+    } else if (cuttingType2) {
+        cuttingParams.type = kCutting2;
+    }
+
+    cuttingParams.showLines = cuttingShowLines;
+    cuttingParams.range = cuttingRange;
+
+    documentList.setBlendingParams(blendingParams);
+    documentList.setCuttingParams(cuttingParams);
+    
 	documentList.updateImage(UpdateImageType::kUpdateAll);
+}
+
+void ofApp::resetCuttings()
+{
+    cuttingType1.removeListener(this, &ofApp::cuttingType1Changed);
+    cuttingType2.removeListener(this, &ofApp::cuttingType2Changed);
+
+    cuttingType1 = false;
+    cuttingType2 = false;
+
+    cuttingType1.addListener(this, &ofApp::cuttingType1Changed);
+    cuttingType2.addListener(this, &ofApp::cuttingType2Changed);
+}
+
+void ofApp::cuttingShowLinesChanged(bool& show)
+{
+    updateParameters();
+}
+
+void ofApp::cuttingType1Changed(bool& show)
+{
+    resetCuttings();
+    cuttingType1 = true;
+    updateParameters();
+}
+
+void ofApp::cuttingType2Changed(bool& show)
+{
+    resetCuttings();
+    cuttingType2 = true;
+    updateParameters();
+}
+
+void ofApp::cuttingRangeChanged(int& value)
+{
+    updateParameters();
 }

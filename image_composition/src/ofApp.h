@@ -56,6 +56,18 @@ private:
 	void blendingRampEndChanged(int& value);
 	
     ofxGuiGroup cuttingGui;
+	ofParameter<bool> cuttingShowLines;
+	ofParameter<bool> cuttingType1;
+	ofParameter<bool> cuttingType2;
+	ofxIntSlider cuttingRange;
+
+	CuttingParams cuttingParams;
+    
+	void resetCuttings();
+	void cuttingShowLinesChanged(bool& show);
+	void cuttingType1Changed(bool& show);
+	void cuttingType2Changed(bool& show);
+	void cuttingRangeChanged(int& value);
     
     ofxPanel gui;
 

@@ -17,6 +17,12 @@ enum ArithmeticType
     kArithmeticRampImage,
 };
 
+enum CuttingType
+{
+    kCutting1,
+    kCutting2,
+};
+
 enum UpdateImageType
 {
 	kUpdateAll,
@@ -31,19 +37,28 @@ struct BlendingParams
 	float rampEnd;
 };
 
+struct CuttingParams
+{
+    CuttingType type;
+    int range;
+    bool showLines;
+};
+
 class ImageDocumentList
 {
 	std::vector<ImageDocument*> list;
 
 	ofRectangle intersect;
 
-    ProcessingType processing_type_;
+    ProcessingType processingType;
 
 	BlendingParams blendingParams;
 	cv::Mat rampImage1;
 	cv::Mat rampImage2;
 
 	ofImage intersectImage;
+    
+	CuttingParams cuttingParams;
 
 	void clear();
 
@@ -68,11 +83,14 @@ public:
 	ImageDocument* hitTest(const ofEasyCam& cam, const ofVec2f& mouse);
 	ImageDocument* getActive(ActiveType active_type);
 
-    ProcessingType processing_type() { return processing_type_; }
-    void set_processing_type(ProcessingType processing_type) { processing_type_ = processing_type; }
+    ProcessingType getProcessingType() { return processingType; }
+    void setProcessingType(ProcessingType processing_type) { processingType = processing_type; }
 
 	BlendingParams getArithmeticParams() { return blendingParams; }
 	void setBlendingParams(BlendingParams params) { blendingParams = params; }
+
+	CuttingParams getCuttingParams() { return cuttingParams; }
+	void setCuttingParams(CuttingParams params) { cuttingParams = params; }
 
 	void updateImage(UpdateImageType updateType);
 

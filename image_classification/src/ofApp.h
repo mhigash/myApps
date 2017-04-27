@@ -13,6 +13,7 @@ class ofApp : public ofBaseApp{
         kKnn,
         kBayes,
         kSvm,
+        kPerceptron,
         kUnknown
     } Classifiers;
     
@@ -21,6 +22,7 @@ class ofApp : public ofBaseApp{
     ofParameter<bool> classifierKnn;
     ofParameter<bool> classifierBayes;
     ofParameter<bool> classifierSvm;
+    ofParameter<bool> classifierPerceptron;
     
     ofxGuiGroup runGroup;
     ofxButton trainingButton;
@@ -73,6 +75,7 @@ class ofApp : public ofBaseApp{
     void classifierKnnChanged(bool& show);
     void classifierBayesChanged(bool& show);
     void classifierSvmChanged(bool& show);
+    void classifierPerceptronChanged(bool& show);
     void trainingButtonPressed();
     void classifyButtonPressed();
     

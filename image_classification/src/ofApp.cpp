@@ -3,6 +3,7 @@
 #include "knn_classifier.hpp"
 #include "bayes_classifier.hpp"
 #include "svm_classifier.hpp"
+#include "perceptron_classifier.hpp"
 
 //--------------------------------------------------------------
 void ofApp::setup() {
@@ -14,6 +15,7 @@ void ofApp::setup() {
     classifierGroup.add(classifierKnn.set("knn", false, true, false));
     classifierGroup.add(classifierBayes.set("bayes", false, true, false));
     classifierGroup.add(classifierSvm.set("svm", false, true, false));
+    classifierGroup.add(classifierPerceptron.set("perceptron", false, true, false));
     classifierGroup.setName("classfier");
     
     runGroup.setup("run");
@@ -308,10 +310,12 @@ void ofApp::SetClassifierType(Classifiers classifier) {
     classifierKnn.removeListener(this, &ofApp::classifierKnnChanged);
     classifierBayes.removeListener(this, &ofApp::classifierBayesChanged);
     classifierSvm.removeListener(this, &ofApp::classifierSvmChanged);
+    classifierPerceptron.removeListener(this, &ofApp::classifierPerceptronChanged);
     
     classifierKnn = false;
     classifierBayes = false;
     classifierSvm = false;
+    classifierPerceptron = false;
     
     classifier_type_ = classifier;
     
@@ -321,11 +325,14 @@ void ofApp::SetClassifierType(Classifiers classifier) {
         classifierBayes = true;
     } else if (classifier_type_ == kSvm) {
         classifierSvm = true;
+    } else if (classifier_type_ == kPerceptron) {
+        classifierPerceptron = true;
     }
     
     classifierKnn.addListener(this, &ofApp::classifierKnnChanged);
     classifierBayes.addListener(this, &ofApp::classifierBayesChanged);
     classifierSvm.addListener(this, &ofApp::classifierSvmChanged);
+    classifierPerceptron.addListener(this, &ofApp::classifierPerceptronChanged);
 }
 
 void ofApp::classifierKnnChanged(bool& show) {
@@ -338,6 +345,10 @@ void ofApp::classifierBayesChanged(bool& show) {
 
 void ofApp::classifierSvmChanged(bool& show) {
     SetClassifierType(kSvm);
+}
+
+void ofApp::classifierPerceptronChanged(bool& show) {
+    SetClassifierType(kPerceptron);
 }
 
 void ofApp::trainingButtonPressed() {
@@ -359,6 +370,8 @@ void ofApp::trainingButtonPressed() {
             classifier_ = new BayesClassifier();
         } else if (classifier_type_ == kSvm) {
             classifier_ = new SvmClassifier();
+        } else if (classifier_type_ == kPerceptron) {
+            classifier_ = new PerceptronClassifier(3);
         }
         
         classifier_->Train(data_, label_);

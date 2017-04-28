@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="..\classifier\bayes_classifier.cpp" />
     <ClCompile Include="..\classifier\knn_classifier.cpp" />
+    <ClCompile Include="..\classifier\perceptron_classifier.cpp" />
     <ClCompile Include="..\classifier\svm_classifier.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="..\classifier\bayes_classifier.hpp" />
     <ClInclude Include="..\classifier\classifier.h" />
     <ClInclude Include="..\classifier\knn_classifier.hpp" />
+    <ClInclude Include="..\classifier\perceptron_classifier.hpp" />
     <ClInclude Include="..\classifier\svm_classifier.hpp" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />

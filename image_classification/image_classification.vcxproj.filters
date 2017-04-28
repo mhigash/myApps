@@ -67,6 +67,9 @@
     <ClCompile Include="..\classifier\svm_classifier.cpp">
       <Filter>classifier</Filter>
     </ClCompile>
+    <ClCompile Include="..\classifier\perceptron_classifier.cpp">
+      <Filter>classifier</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -471,6 +474,9 @@
       <Filter>classifier</Filter>
     </ClInclude>
     <ClInclude Include="..\classifier\svm_classifier.hpp">
+      <Filter>classifier</Filter>
+    </ClInclude>
+    <ClInclude Include="..\classifier\perceptron_classifier.hpp">
       <Filter>classifier</Filter>
     </ClInclude>
   </ItemGroup>

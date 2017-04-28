@@ -371,7 +371,7 @@ void ofApp::trainingButtonPressed() {
         } else if (classifier_type_ == kSvm) {
             classifier_ = new SvmClassifier();
         } else if (classifier_type_ == kPerceptron) {
-            classifier_ = new PerceptronClassifier(3);
+            classifier_ = new PerceptronClassifier();
         }
         
         classifier_->Train(data_, label_);

@@ -12,14 +12,17 @@
 #include "classifier.h"
 
 class PerceptronClassifier : public Classifier {
-    cv::Mat samples_;
-    cv::Mat labels_;
-    int k_;
-    
-    float EuclidDiatance(const cv::Mat point1, const cv::Mat& point2);
+	float eta_;
+	int n_iter_;
+
+	float w0_;
+	std::vector<float> w_;
+	std::vector<float> errors_;
+
+	float NetInput(const std::vector<float> &x);
     
 public:
-    PerceptronClassifier(int k);
+    PerceptronClassifier(float eta = 0.01f, int n_iter = 10);
     ~PerceptronClassifier();
     
     bool Train(const cv::Mat& data, const cv::Mat& label);

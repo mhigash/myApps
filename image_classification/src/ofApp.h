@@ -43,17 +43,24 @@ class ofApp : public ofBaseApp{
     
     Classifier* classifier_;
     cv::Mat classified_label_;
+
+    // mesh grid for classification
     cv::Mat label_map_;
     cv::Mat label_map_resized_;
     
+    // arguments for findContours
     vector<vector<cv::Point> > contours_;
     vector<cv::Vec4i> hierarchy_;
+
+    // histroy of operation
+    std::vector<std::string> history_;
 
     bool LoadData(const std::string& filepath);
     void ClassifyData();
     void UpdateContours(int width, int height);
     
     void SetClassifierType(Classifiers classifier);
+    void AddHistory(bool training, float elapsed);
     
 	public:
 		void setup();

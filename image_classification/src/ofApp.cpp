@@ -32,7 +32,7 @@ void ofApp::setup() {
     //old OF default is 96 - but this results in fonts looking larger than in other programs.
     ofTrueTypeFont::setGlobalDpi(72);
     
-    verdana14_.load("verdana.ttf", 20, true, true);
+    verdana14_.load("Verdana.ttf", 14, true, true);
     verdana14_.setLineHeight(18.0f);
     verdana14_.setLetterSpacing(1.037);
     
@@ -98,7 +98,9 @@ void ofApp::ClassifyData()
     if (!classifier_)
         return;
     
-    float width = static_cast<float>(ofGetWidth());
+    ofResetElapsedTimeCounter();
+
+    float width  = static_cast<float>(ofGetWidth());
     float height = static_cast<float>(ofGetHeight());
     
     for (int r = 0; r < data_.rows; r++) {
@@ -111,27 +113,9 @@ void ofApp::ClassifyData()
     step.y = (max_.y - min_.y) / mesh_size.height;
     label_map_ = cv::Mat(mesh_size.height, mesh_size.width, CV_32F);
     
-//    int row = 0;
-//    int col = 0;
-    
     cv::Mat data(1, 2, CV_32F);
 
-//    for (float y = min_.y; y <= max_.y; y += step.y) {
-//        for (float x = min_.x; x <= max_.x; x += step.x) {
-//            
-//            data.at<float>(0, 0) = x;
-//            data.at<float>(0, 1) = y;
-//            
-//            float label = classifier_->Classify(data);
-//            label_map_.at<float>(row, col) = label;
-//            
-//            col++;
-//        }
-//        
-//        row++;
-//        col = 0;
-//    }
-    
+    // classification of grid data.
     float y = min_.y;
     for (int r = 0; r < label_map_.rows; r++) {
         float x = min_.x;
@@ -147,6 +131,8 @@ void ofApp::ClassifyData()
         }
         y += step.y;
     }
+
+    AddHistory(false, ofGetElapsedTimef());
     
     UpdateContours(width, height);
 }
@@ -241,13 +227,19 @@ void ofApp::draw(){
         ofDrawLine(p2, p0);
     }
  
-//    ofSetColor(255, 0, 255);
-//    verdana14_.drawString("test", 50, 50);
-    
     // gui
     gui.setPosition(ofGetWidth() - gui.getWidth() - 10, gui.getPosition().y);
     gui.draw();
     
+    ofSetColor(0, 0, 0);
+
+    std::vector<std::string>::iterator itr = history_.begin();
+    int row = 1;
+
+    for (; itr != history_.end(); itr++) {
+        verdana14_.drawString(*itr, 50, row * 20);
+        row++;
+    }
     
 }
 
@@ -374,7 +366,10 @@ void ofApp::trainingButtonPressed() {
             classifier_ = new PerceptronClassifier();
         }
         
+        ofResetElapsedTimeCounter();
         classifier_->Train(data_, label_);
+
+        AddHistory(true, ofGetElapsedTimef());
     }
     
 }
@@ -389,4 +384,28 @@ void ofApp::classifyButtonPressed() {
         
         ClassifyData();
     }
+}
+
+void ofApp::AddHistory(bool training, float elapsed) {
+    char history[256];
+
+    if (training)
+        sprintf(history, "training by");
+    else
+        sprintf(history, "classify by");
+    
+    if (classifier_type_ == kKnn) {
+        sprintf(history, "%s knn", history);
+    } else if (classifier_type_ == kBayes) {
+        sprintf(history, "%s bayes", history);
+    } else if (classifier_type_ == kSvm) {
+        sprintf(history, "%s svm", history);
+    } else if (classifier_type_ == kPerceptron) {
+        sprintf(history, "%s perceptron", history);
+    }
+
+    sprintf(history, "%s %3.3f", history, elapsed);
+    //history << "in " << std::setprecision(3) << elapsed << " sec";
+
+    history_.push_back(history);
 }

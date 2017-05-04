@@ -17,12 +17,13 @@ class PerceptronClassifier : public Classifier {
 
 	float w0_;
 	std::vector<float> w_;
-	std::vector<float> errors_;
+	std::vector<int> errors_;
 
-	float NetInput(const std::vector<float> &x);
+    float NetInput(const std::vector<float> &x);
+    float Predict(const cv::Mat &data);
     
 public:
-    PerceptronClassifier(float eta = 0.01f, int n_iter = 10);
+    PerceptronClassifier(float eta = 0.01f, int n_iter = 30);
     ~PerceptronClassifier();
     
     bool Train(const cv::Mat& data, const cv::Mat& label);

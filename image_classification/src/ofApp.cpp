@@ -167,13 +167,34 @@ void ofApp::draw(){
     float width = static_cast<float>(ofGetWidth());
     float height = static_cast<float>(ofGetHeight());
     
+    // Adjustments make margin
+    float margin = .1f; // in percentage
+    // Eliminates both side from border 
+    float scale = (1.0f - margin * 2.0f);
+    float offset_x = width * margin;
+    float offset_y = height * margin;
+    bool invert_y = true;
+    
+    ofSetColor(128, 128, 255);
+    //ofSetColor(128, 255, 128);
+    ofRectangle rect(offset_x, offset_y, width * scale, height * scale);
+    ofDrawRectangle(rect);
+    
     float* p = reinterpret_cast<float*>(data_.data);
     for (int r = 0; r < data_.rows; r++) {
         float x = data_.row(r).at<float>(0, 0);
         float y = data_.row(r).at<float>(0, 1);
         
+        // Relative location 
         x = (x - min_.x) / (max_.x - min_.x) * width;
         y = (y - min_.y) / (max_.y - min_.y) * height;
+
+        // Scaling
+        x = x * scale + offset_x;
+        if (invert_y)
+            y = (height - y) * scale + offset_y;
+        else
+            y = y * scale + offset_y;
         
         float label = label_.at<float>(r, 0);
         float classified_label = classified_label_.at<float>(r, 0);
@@ -213,12 +234,27 @@ void ofApp::draw(){
             if (itr2 == itr1->begin()) {
                 p1.x = itr2->x;
                 p1.y = itr2->y;
+                
+                // Scaling
+                p1.x = p1.x * scale + offset_x;
+                if (invert_y)
+                    p1.y = (height - p1.y) * scale + offset_y;
+                else
+                    p1.y = p1.y * scale + offset_y;
+
                 p0 = p1;
                 continue;
             }
             
             p2.x = itr2->x;
             p2.y = itr2->y;
+
+            // Scaling
+            p2.x = p2.x * scale + offset_x;
+            if (invert_y)
+                p2.y = (height - p2.y) * scale + offset_y;
+            else
+                p2.y = p2.y * scale + offset_y;
             
             ofDrawLine(p1, p2);
             

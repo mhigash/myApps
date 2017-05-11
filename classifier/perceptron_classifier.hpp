@@ -11,12 +11,17 @@
 
 #include "classifier.h"
 
+// Perceptron classifier.
 class PerceptronClassifier : public Classifier {
+	// Learning rate (between 0.0 and 1.0)
 	float eta_;
+	// Passes over the training dataset.
 	int n_iter_;
 
 	float w0_;
+	// Weights after fitting.
 	std::vector<float> w_;
+	// Number of misclassifications (updates) in each epoch.
 	std::vector<int> errors_;
 
     float NetInput(const std::vector<float> &x);

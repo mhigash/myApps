@@ -32,31 +32,16 @@ void ofApp::setup() {
     //old OF default is 96 - but this results in fonts looking larger than in other programs.
     ofTrueTypeFont::setGlobalDpi(72);
     
-    verdana14_.load("Verdana.ttf", 14, true, true);
-    verdana14_.setLineHeight(18.0f);
-    verdana14_.setLetterSpacing(1.037);
+    //verdana14_.load("Verdana.ttf", 14, true, true);
+    //verdana14_.setLineHeight(18.0f);
+    //verdana14_.setLetterSpacing(1.037);
     
     // set type of classification
     SetClassifierType(kKnn);
     
     classifier_ = nullptr;
     
-//    cv::Mat image = cv::imread("20161127-01.jpg");
-//    
-//    int cols = image.cols;
-//
-//    if (image.empty())
-//        printf("empty");
-    
-//    std::vector<cv::Vec3f> pointList;
-//    loadPoints3("/Users/hgsmrmss/Documents/code_samples/python/points.csv", pointList);
-//    
-//    cv::Vec3f point3 = pointList[0];
-//    cout << point3;
-    
-    ofFill();
-
-    
+    ofFill();    
 }
 
 bool ofApp::LoadData(const std::string& filepath) {
@@ -267,13 +252,15 @@ void ofApp::draw(){
     gui.setPosition(ofGetWidth() - gui.getWidth() - 10, gui.getPosition().y);
     gui.draw();
     
+	// history
     ofSetColor(0, 0, 0);
 
     std::vector<std::string>::iterator itr = history_.begin();
     int row = 1;
 
     for (; itr != history_.end(); itr++) {
-        verdana14_.drawString(*itr, 50, row * 20);
+        //verdana14_.drawString(*itr, 50, row * 20);
+		ofDrawBitmapString(*itr, 20, row * 20);
         row++;
     }
     
@@ -440,7 +427,7 @@ void ofApp::AddHistory(bool training, float elapsed) {
         sprintf(history, "%s perceptron", history);
     }
 
-    sprintf(history, "%s %3.3f", history, elapsed);
+    sprintf(history, "%s took %3.3f sec", history, elapsed);
     //history << "in " << std::setprecision(3) << elapsed << " sec";
 
     history_.push_back(history);

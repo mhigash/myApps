@@ -28,10 +28,7 @@ class ofApp : public ofBaseApp{
     ofxButton trainingButton;
     ofxButton classifyButton;
     
-    
-    ofTrueTypeFont	verdana14_;
-    
-    
+  
     
     Classifiers classifier_type_;
 

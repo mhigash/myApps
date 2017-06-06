@@ -39,10 +39,12 @@ bool KnnClassifier::Train(const cv::Mat& data, const cv::Mat& labels) {
 int KnnClassifier::Classify(const cv::Mat& data) {
     
     if (samples_.cols != data.cols) {
+        std::cout << "Cols mismatch." << samples_.cols << "," << data.cols << std::endl;
         return 0;
     }
     
     if (data.rows != 1) {
+        std::cout << "Rows is not 1." << std::endl;
         return 0;
     }
 

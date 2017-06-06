@@ -40,6 +40,8 @@ class ofApp : public ofBaseApp{
 
 	MeasurementDataSet measurement;
 	HsImageDataType currentImageType;
+	HsImageColorType currentColorType;
+	HsColorSetting currentColorSetting;
 
 	ofParameterGroup parameters;
 	ofParameter<bool> showTristimulusX;
@@ -56,7 +58,7 @@ class ofApp : public ofBaseApp{
 	ofParameter<bool> showSpectralRadiance;
 	ofParameter<int> wavelength;
 
-	void resetShowImage();
+	void resetImageType();
 	void showTristimulusXChanged(bool& show);
 	void showTristimulusYChanged(bool& show);
 	void showTristimulusZChanged(bool& show);
@@ -71,7 +73,7 @@ class ofApp : public ofBaseApp{
 	void showSpectralRadianceChanged(bool& show);
 	void wavelengthChanged(int& wavlength);
 
-	void updateCurrentImage(HsImageDataType imageType);
+	void updateCurrentImage();
 
 	ofParameterGroup colors;
 	ofParameter<bool> showColorPseudo;
@@ -79,6 +81,13 @@ class ofApp : public ofBaseApp{
 	ofParameter<bool> showColorGrayscale;
 	ofParameter<bool> showColorGrayscaleContour;
 	ofParameter<bool> showColorRGB;
+
+	void resetColorType();
+	void showColorPseudoChanged(bool& show);
+	void showColorPseudoContourChanged(bool& show);
+	void showColorGrayscaleChanged(bool& show);
+	void showColorGrayscaleContourChanged(bool& show);
+	void showColorRGBChanged(bool& show);
 
 	ofParameterGroup views;
 	ofParameter<bool> showHistogram;

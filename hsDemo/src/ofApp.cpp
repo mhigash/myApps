@@ -22,11 +22,11 @@ void ofApp::setup(){
 	parameters.add(showSpectralRadiance.set("lambda", false, false, true));
 	parameters.add(wavelength.set("wavelength", 555, 380, 780));
 
-	resetShowImage();
+	resetImageType();
+	showTristimulusY = true;
+	currentImageType = HS_IMAGE_DATA_TYPE_TRISTIMULUS_Y;
 
 	wavelength.addListener(this, &ofApp::wavelengthChanged);
-
-	showTristimulusY = true;
 
 	colors.setName("color");
 	colors.add(showColorPseudo.set("pseudo", true, false, true));
@@ -34,6 +34,12 @@ void ofApp::setup(){
 	colors.add(showColorGrayscale.set("grayscale", false, false, true));
 	colors.add(showColorGrayscaleContour.set("grayscale contour", false, false, true));
 	colors.add(showColorRGB.set("RGB", false, false, true));
+
+	resetColorType();
+	showColorPseudo = true;
+	currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+	
+	memset(&currentColorType, 0, sizeof(currentColorType));
 
 	views.setName("view");
 	views.add(showHistogram.set("histogram", true, false, true));
@@ -280,16 +286,14 @@ void ofApp::processOpenFileSelection(ofFileDialogResult openFileResult){
 	ofLogVerbose("getPath(): "  + openFileResult.getPath());
 	
 	ofFile file (openFileResult.getPath()); 
-	if (!file.exists())
-		return;
+	if (!file.exists()) return;
 	
 	ofLogVerbose("The file exists - now checking the type via file extension");
 	string fileExtension = ofToUpper(file.getExtension());
 		
 	if (fileExtension == "HSM") {
 		HsError ret = measurement.Load(openFileResult.getPath());
-		if (ret != HS_ERROR_NONE)
-			return;
+		if (ret != HS_ERROR_NONE) return;
 
 		images.clear();
 
@@ -297,17 +301,16 @@ void ofApp::processOpenFileSelection(ofFileDialogResult openFileResult){
 			ofImage image1;
 			ret = measurement.GetImage(HsImageDataType::HS_IMAGE_DATA_TYPE_SPECTRAL_RADIANCE, wavlen, image1);
 	
-			if (ret != HS_ERROR_NONE)
-				continue;
+			if (ret != HS_ERROR_NONE) continue;
 
 			images.push_back(image1);
 		}
 
-		updateCurrentImage(currentImageType);
+		updateCurrentImage();
 	}
 }
 
-void ofApp::resetShowImage()
+void ofApp::resetImageType()
 {
 	showTristimulusX.removeListener(this, &ofApp::showTristimulusXChanged);
 	showTristimulusY.removeListener(this, &ofApp::showTristimulusYChanged);
@@ -350,87 +353,121 @@ void ofApp::resetShowImage()
 }
 
 void ofApp::showTristimulusXChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showTristimulusX = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_TRISTIMULUS_X);
+	updateCurrentImage();
 }
 
 void ofApp::showTristimulusYChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showTristimulusY = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_TRISTIMULUS_Y);
+	updateCurrentImage();
 }
 
 void ofApp::showTristimulusZChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showTristimulusZ = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_TRISTIMULUS_Z);
+	updateCurrentImage();
 }
 
 void ofApp::showChromaticityXChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showChromaticityX = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_CHROMATICITY_X);
+	updateCurrentImage();
 }
 
 void ofApp::showChromaticityYChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showChromaticityY = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_CHROMATICITY_Y);
+	updateCurrentImage();
 }
 
 void ofApp::showChromaticityUChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showChromaticityU = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_CHROMATICITY_U);
+	updateCurrentImage();
 }
 
 void ofApp::showChromaticityVChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showChromaticityV = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_CHROMATICITY_V);
+	updateCurrentImage();
 }
 
 void ofApp::showLabLChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showLabL = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_LAB_L);
+	updateCurrentImage();
 }
 
 void ofApp::showLabAChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showLabA = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_LAB_A);
+	updateCurrentImage();
 }
 
 void ofApp::showLabBChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showLabB = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_LAB_B);
+	updateCurrentImage();
 }
 
 void ofApp::showRgbChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showRgb = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_RGB);
+	updateCurrentImage();
 }
 
 void ofApp::showSpectralRadianceChanged(bool& show){
-	resetShowImage();
+	resetImageType();
 	showSpectralRadiance = true;
-	updateCurrentImage(HS_IMAGE_DATA_TYPE_SPECTRAL_RADIANCE);
+	updateCurrentImage();
 }
 
 void ofApp::wavelengthChanged(int& wavlength)
 {
 	if (showSpectralRadiance) {
-		updateCurrentImage(HS_IMAGE_DATA_TYPE_SPECTRAL_RADIANCE);
+		updateCurrentImage();
 	}
 }
 
-void ofApp::updateCurrentImage(HsImageDataType imageType)
+void ofApp::updateCurrentImage()
 {
-	currentImageType = imageType;
+	if (showTristimulusX)
+		currentImageType = HS_IMAGE_DATA_TYPE_TRISTIMULUS_X;
+	else if (showTristimulusY)
+		currentImageType = HS_IMAGE_DATA_TYPE_TRISTIMULUS_Y;
+	else if (showTristimulusZ)
+		currentImageType = HS_IMAGE_DATA_TYPE_TRISTIMULUS_Z;
+	else if (showChromaticityX)
+		currentImageType = HS_IMAGE_DATA_TYPE_CHROMATICITY_X;
+	else if (showChromaticityY)
+		currentImageType = HS_IMAGE_DATA_TYPE_CHROMATICITY_Y;
+	else if (showChromaticityU)
+		currentImageType = HS_IMAGE_DATA_TYPE_CHROMATICITY_U;
+	else if (showChromaticityV)
+		currentImageType = HS_IMAGE_DATA_TYPE_CHROMATICITY_V;
+	else if (showLabL)
+		currentImageType = HS_IMAGE_DATA_TYPE_LAB_L;
+	else if (showLabA)
+		currentImageType = HS_IMAGE_DATA_TYPE_LAB_A;
+	else if (showLabB)
+		currentImageType = HS_IMAGE_DATA_TYPE_LAB_B;
+	else if (showRgb)
+		currentImageType = HS_IMAGE_DATA_TYPE_RGB;
+	else if (showSpectralRadiance)
+		currentImageType = HS_IMAGE_DATA_TYPE_SPECTRAL_RADIANCE;
+
+	if (showColorPseudo)
+		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+	else if (showColorPseudoContour)
+		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+	else if (showColorGrayscale)
+		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+	else if (showColorGrayscaleContour)
+		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+	else if (showColorRGB)
+		currentColorType = HS_IMAGE_COLOR_TYPE_RGB;
 
 	HsError ret = measurement.GetImage(currentImageType, wavelength, currentImage);
 	if (ret != HS_ERROR_NONE)
@@ -447,3 +484,60 @@ void ofApp::updateCurrentImage(HsImageDataType imageType)
 		}
 	}
 }
+
+void ofApp::resetColorType()
+{
+	showColorPseudo.removeListener(this, &ofApp::showColorPseudoChanged);
+	showColorPseudoContour.removeListener(this, &ofApp::showColorPseudoContourChanged);
+	showColorGrayscale.removeListener(this, &ofApp::showColorGrayscaleChanged);
+	showColorGrayscaleContour.removeListener(this, &ofApp::showColorGrayscaleContourChanged);
+	showColorRGB.removeListener(this, &ofApp::showColorRGBChanged);
+
+	showColorPseudo = false;
+	showColorPseudoContour = false;
+	showColorGrayscale = false;
+	showColorGrayscaleContour = false;
+	showColorRGB = false;
+
+	showColorPseudo.addListener(this, &ofApp::showColorPseudoChanged);
+	showColorPseudoContour.addListener(this, &ofApp::showColorPseudoContourChanged);
+	showColorGrayscale.addListener(this, &ofApp::showColorGrayscaleChanged);
+	showColorGrayscaleContour.addListener(this, &ofApp::showColorGrayscaleContourChanged);
+	showColorRGB.addListener(this, &ofApp::showColorRGBChanged);
+}
+
+void ofApp::showColorPseudoChanged(bool& show)
+{
+	resetColorType();
+	showColorPseudo = true;
+	updateCurrentImage();
+}
+
+void ofApp::showColorPseudoContourChanged(bool& show)
+{
+	resetColorType();
+	showColorPseudoContour = true;
+	updateCurrentImage();
+}
+
+void ofApp::showColorGrayscaleChanged(bool& show)
+{
+	resetColorType();
+	showColorGrayscale = true;
+	updateCurrentImage();
+}
+
+void ofApp::showColorGrayscaleContourChanged(bool& show)
+{
+	resetColorType();
+	showColorGrayscaleContour = true;
+	updateCurrentImage();
+}
+
+void ofApp::showColorRGBChanged(bool& show)
+{
+	resetColorType();
+	showColorRGB = true;
+	updateCurrentImage();
+}
+

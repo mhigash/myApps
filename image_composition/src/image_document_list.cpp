@@ -573,7 +573,10 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	//dump2 << src2_gray << std::endl;
 	//dump3 << diff << std::endl;
 	
-	cv::Mat error = diff.clone();
+//	cv::Mat error = diff.clone();
+	cv::Mat error = cv::Mat::zeros(diff.rows, diff.cols, diff.type());
+	float init_val = std::numeric_limits<float>::max();
+	error.setTo(init_val);
 	std::vector<cv::Point> min_points;
 
 	// This is the way described in the paper

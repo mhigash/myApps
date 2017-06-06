@@ -556,6 +556,8 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	cv::Mat src1_grayf;
 	cv::Mat src2_grayf;
 	cv::Mat diff;
+    // 'e' in the document
+	cv::Mat error_surface;
 
     cv::cvtColor(src1, src1_gray, CV_BGR2GRAY);
     cv::cvtColor(src2, src2_gray, CV_BGR2GRAY);
@@ -565,7 +567,7 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 
 	//diff = src1_gray - src2_gray;
     cv::subtract(src1_grayf, src2_grayf, diff);
-    cv::multiply(diff, diff, diff);
+    cv::multiply(diff, diff, error_surface);
 	//ofstream dump1("src1-gray.csv");
 	//ofstream dump2("src2-gray.csv");
 	//ofstream dump3("diff.csv");
@@ -573,7 +575,9 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	//dump2 << src2_gray << std::endl;
 	//dump3 << diff << std::endl;
 	
-	cv::Mat error = diff.clone();
+    // 'E' in the document
+	cv::Mat error = error_surface.clone();
+	//cv::Mat error = cv::Mat::zeros(error_surface.size(), CV_32F);
 	std::vector<cv::Point> min_points;
 
 	// This is the way described in the paper
@@ -581,13 +585,18 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	// My implementation is missing something and it doesn't work as described.
 	//
     if (cuttingParams.type == kCutting1) {
-        for (int r = 1; r < diff.rows; r++) {
-            for (int c = 1; c < diff.cols - 1; c++) {
+        for (int r = 0; r < diff.rows; r++) {
+            for (int c = 0; c < diff.cols - 1; c++) {
+                if (r == 0 || c == 0) {
+                    error.at<float>(r, c) = std::numeric_limits<float>::max();
+                    continue;
+                }
+                    
                 float e1 = error.at<float>(r - 1, c - 1);
                 float e2 = error.at<float>(r - 1, c);
                 float e3 = error.at<float>(r - 1, c + 1);
                 float min_val = std::min(std::min(e1, e2), e3);
-                error.at<float>(r, c) = diff.at<float>(r, c) + min_val;
+                error.at<float>(r, c) = error_surface.at<float>(r, c) + min_val;
             }
         }
 
@@ -601,15 +610,15 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
     } else if (cuttingParams.type == kCutting2) {
         cv::Point last_min;
 
-        for (int r = 0; r < error.rows; r++) {
+        for (int r = 0; r < error_surface.rows; r++) {
             if (r == 0) {
                 double min_val, max_val;
                 cv::Point min_loc, max_loc;
-                cv::Mat row = error.row(r);
+                cv::Mat row = error_surface.row(r);
                 cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
                 last_min = cv::Point(min_loc.x, r);
             } else {
-                std::vector<ValueIndex<float> > error_values;
+                std::vector<ValueIndex<float> > error_surface_values;
 
                 int range = cuttingParams.range;
 
@@ -617,20 +626,20 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
                     ValueIndex<float> e;
                     int c = last_min.x + i;
                     c = std::max(c, 0);
-                    c = std::min(c, error.cols - 1);
-                    e.value = error.at<float>(r, c);
+                    c = std::min(c, error_surface.cols - 1);
+                    e.value = error_surface.at<float>(r, c);
                     e.index = c;
-                    error_values.push_back(e);
+                    error_surface_values.push_back(e);
                 }
 
-                std::sort(error_values.begin(), error_values.end());
+                std::sort(error_surface_values.begin(), error_surface_values.end());
 
-                last_min.x = error_values[0].index;
+                last_min.x = error_surface_values[0].index;
                 last_min.y = r;
             }
 
             last_min.x = std::max(last_min.x, 1);
-            last_min.x = std::min(last_min.x, error.cols - 2);
+            last_min.x = std::min(last_min.x, error_surface.cols - 2);
 
             min_points.push_back(last_min);
         }

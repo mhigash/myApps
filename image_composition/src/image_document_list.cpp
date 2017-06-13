@@ -565,7 +565,6 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	src1_gray.convertTo(src1_grayf, CV_32F);
 	src2_gray.convertTo(src2_grayf, CV_32F);
 
-	//diff = src1_gray - src2_gray;
     cv::subtract(src1_grayf, src2_grayf, diff);
     cv::multiply(diff, diff, error_surface);
 	//ofstream dump1("src1-gray.csv");
@@ -577,7 +576,6 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	
     // 'E' in the document
 	cv::Mat error = error_surface.clone();
-	//cv::Mat error = cv::Mat::zeros(error_surface.size(), CV_32F);
 	std::vector<cv::Point> min_points;
 
 	// This is the way described in the paper
@@ -585,13 +583,8 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 	// My implementation is missing something and it doesn't work as described.
 	//
     if (cuttingParams.type == kCutting1) {
-        for (int r = 0; r < diff.rows; r++) {
-            for (int c = 0; c < diff.cols - 1; c++) {
-                if (r == 0 || c == 0) {
-                    error.at<float>(r, c) = std::numeric_limits<float>::max();
-                    continue;
-                }
-                    
+        for (int r = 1; r < error.rows; r++) {
+            for (int c = 1; c < error.cols - 1; c++) {
                 float e1 = error.at<float>(r - 1, c - 1);
                 float e2 = error.at<float>(r - 1, c);
                 float e3 = error.at<float>(r - 1, c + 1);
@@ -600,13 +593,40 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
             }
         }
 
-        for (int r = 0; r < error.rows; r++) {
-            double min_val, max_val;
-            cv::Point min_loc, max_loc;
-            cv::Mat row = error.row(r);
-            cv::minMaxLoc(row, &min_val, &max_val, &min_loc);
-            min_points.push_back(cv::Point(min_loc.x, r));
+        // Find the minimum of the last row
+        cv::Mat last_row = error.row(error.rows - 1);
+        int min_col = 0;
+        
+        float min_val = std::numeric_limits<float>::max();
+        int offset = cuttingParams.range;
+        for (int c = offset; c < error.cols - offset; c++) {
+            float val = error.at<float>(0, c);
+            if (min_val > val) {
+                min_val = val;
+                min_col = c;
+            }
         }
+        
+        min_points.push_back(cv::Point(min_col, error.rows - 1));
+        
+        // Trace back from the last row
+        for (int r = error.rows - 2; r >= 0; r--) {
+            min_val = std::numeric_limits<float>::max();
+            
+            int last_col = min_col;
+            for (int c = last_col - offset; c < last_col + offset; c++) {
+                if (c < 0) continue;
+                if (c >= error.cols) continue;
+                
+                float val = error.at<float>(r, c);
+                if (min_val > val) {
+                    min_val = val;
+                    min_col = c;
+                }
+            }
+            min_points.push_back(cv::Point(min_col, r));
+        }
+        
     } else if (cuttingParams.type == kCutting2) {
         cv::Point last_min;
 
@@ -663,11 +683,10 @@ void ImageDocumentList::drawForCutting(const cv::Mat &src1, const cv::Mat &src2,
 
     if (cuttingParams.showLines) {
         int count = 0;
-        pt1.x = pt1.y = 0;
         
         for (itr = min_points.begin(); itr != min_points.end(); itr++) {
             if (count == 0) {
-               
+                pt1 = *itr;
                 count++;
                 continue;
             }

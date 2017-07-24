@@ -4,6 +4,7 @@
 #include "ofxGui.h"
 
 #include "MeasurementDataSet.h"
+#include "ColorBar.h"
 
 class ofApp : public ofBaseApp{
 
@@ -35,7 +36,8 @@ class ofApp : public ofBaseApp{
 
 	ofImage currentImage;
 	ofPoint mouse;
-	
+	ofMatrix4x4 viewMatrix;
+
 	std::vector<ofImage> images;
 
 	MeasurementDataSet measurement;
@@ -99,4 +101,5 @@ class ofApp : public ofBaseApp{
 	int histogram_total;
 
 	HsPixelData pixelData;
+	ColorBar pseudoBar;
 };

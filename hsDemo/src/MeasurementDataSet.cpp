@@ -91,7 +91,7 @@ HsError MeasurementDataSet::Load(const std::string& filename)
 		PrintError(ret);
 		return ret;
 	}
-	
+
 	return ret;
 }
 
@@ -100,14 +100,12 @@ HsError MeasurementDataSet::GetImage(HsImageDataType image_type, int wavelength,
 	HsError ret = HS_ERROR_NONE;
 
 	if (image_type == HS_IMAGE_DATA_TYPE_RGB) {
-
 		ret = hsGetRGBColorImage(measurement_data_id_, rgb_color_setting_, &image8u3_);
 		if (ret != HS_ERROR_NONE) {
 			PrintError(ret);
 			return ret;
 		}
 	} else if (image_type == HS_IMAGE_DATA_TYPE_SPECTRAL_RADIANCE) {
-
 		ret = hsGetSpectralImage(measurement_data_id_, wavelength, &image32f_);
 		if (ret != HS_ERROR_NONE) {
 			PrintError(ret);
@@ -120,7 +118,6 @@ HsError MeasurementDataSet::GetImage(HsImageDataType image_type, int wavelength,
 			return ret;
 		}
 	} else {
-
 		HsDataType data_type = image_to_data_[image_type];
 
 		ret = hsGetMeasurementImage(measurement_data_id_, data_type, &image32f_);
@@ -138,28 +135,33 @@ HsError MeasurementDataSet::GetImage(HsImageDataType image_type, int wavelength,
 		}
 	}
 
+	ToOfImage(image8u3_, image);
+	return ret;
+}
+
+void MeasurementDataSet::ToOfImage(const HsImage8u3 &src_image, ofImage& image)
+{
 	// Swap pixel order
-	for (int y = 0; y < image8u3_.height; y++) {
-		for (int x = 0; x < image8u3_.width; x++) {
-			int index0 = y * image8u3_.width * HS_BYTES_PER_PIXEL_8U3 + x * HS_BYTES_PER_PIXEL_8U3;
+	for (int y = 0; y < src_image.height; y++) {
+		for (int x = 0; x < src_image.width; x++) {
+			int index0 = y * src_image.width * HS_BYTES_PER_PIXEL_8U3 + x * HS_BYTES_PER_PIXEL_8U3;
 			int index2 = index0 + 2;
 
-			unsigned char pixel0 = image8u3_.pixels[index0];
-			unsigned char pixel2 = image8u3_.pixels[index2];
+			unsigned char pixel0 = src_image.pixels[index0];
+			unsigned char pixel2 = src_image.pixels[index2];
 
-			image8u3_.pixels[index0] = pixel2;
-			image8u3_.pixels[index2] = pixel0;
+			src_image.pixels[index0] = pixel2;
+			src_image.pixels[index2] = pixel0;
 		}
 	}
 
 	image.setFromPixels(
-		image8u3_.pixels,
-		image8u3_.width,
-		image8u3_.height,
+		src_image.pixels,
+		src_image.width,
+		src_image.height,
 		ofImageType::OF_IMAGE_COLOR,
 		true);
 	
-	return ret;
 }
 
 HsError MeasurementDataSet::GetHistogram(HsImageDataType image_type, float bin, std::vector<int>& histogram)
@@ -208,3 +210,27 @@ HsError MeasurementDataSet::GetHistogram(HsImageDataType image_type, float bin, 
 
 	return ret;
 }
+
+void MeasurementDataSet::GetData(HsMeasurementData *measurement_data)
+{
+	*measurement_data = measurement_data_;
+}
+
+void MeasurementDataSet::GetColorSetting(HsImageDataType image_type, HsColorSetting *color_setting)
+{
+	HsDataType data_type = image_to_data_[image_type];
+	*color_setting = image_setting_.color_setting[data_type];
+}
+
+void MeasurementDataSet::SetColorSetting(HsImageDataType image_type, const HsColorSetting &color_setting)
+{
+	HsDataType data_type = image_to_data_[image_type];
+	image_setting_.color_setting[data_type] = color_setting;
+}
+
+void MeasurementDataSet::GetStatistics(HsImageDataType image_type, HsStatistics *statistics)
+{
+	HsDataType data_type = image_to_data_[image_type];
+	*statistics = measurement_data_.statistics[data_type];
+}
+

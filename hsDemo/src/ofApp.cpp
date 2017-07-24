@@ -57,18 +57,10 @@ void ofApp::setup(){
 
 	ofSetVerticalSync(true);
 
-	// this uses depth information for occlusion
-	// rather than always drawing things on top of each other
-	ofEnableDepthTest();
-
-	// ofBox uses texture coordinates from 0-1, so you can load whatever
-	// sized images you want and still use them to texture your box
-	// but we have to explicitly normalize our tex coords here
-	//
-	// image.draw doesn't work if this is used.
-	ofEnableNormalizedTexCoords();
-
 	measurement.Initialize();
+
+	pseudoBar.Setup();
+	pseudoBar.set_measurement(&measurement);
 }
 
 //--------------------------------------------------------------
@@ -80,13 +72,22 @@ void ofApp::update(){
 void ofApp::draw(){
     ofBackgroundGradient(ofColor::white, ofColor::gray);
 
-	ofEnableDepthTest();
-	ofEnableNormalizedTexCoords();
-
 	ofFill();
 	// draw image
-	ofSetColor(255);
-		
+	ofSetColor(ofColor::white);
+	
+#if 0
+	// this uses depth information for occlusion
+	// rather than always drawing things on top of each other
+	ofEnableDepthTest();
+
+	// ofBox uses texture coordinates from 0-1, so you can load whatever
+	// sized images you want and still use them to texture your box
+	// but we have to explicitly normalize our tex coords here
+	//
+	// image.draw doesn't work if this is used.
+	ofEnableNormalizedTexCoords();
+
 	cam.begin();
 	//documentList.draw();
 
@@ -117,9 +118,36 @@ void ofApp::draw(){
 	}
 
 	cam.end();
-	
+
 	ofDisableDepthTest();
 	ofDisableNormalizedTexCoords();
+#else
+	if (currentImage.bAllocated()) {
+		ofVec2f centerOfWindow = {
+			(ofGetWidth() + gui.getWidth()) / 2.0f,
+			ofGetHeight() / 2.0f };
+
+		ofVec2f centerOfImage = {
+			currentImage.getWidth() / 2.0f,
+			currentImage.getHeight() / 2.0f };
+
+		ofVec2f diff = centerOfWindow - centerOfImage;
+
+		viewMatrix = ofGetCurrentViewMatrix();
+		
+		ofPushMatrix();
+		//ofTranslate(diff);
+
+		viewMatrix.translate(diff);
+		
+		ofLoadViewMatrix(viewMatrix);
+
+		currentImage.draw(0, 0);
+		ofPopMatrix();
+	}
+
+#endif
+	
 
 	if (showHistogram && histogram.size() > 0) {
 		float height = 100;
@@ -170,9 +198,11 @@ void ofApp::draw(){
 	// should the gui control hiding?
 	if( bHide ){
 		// rightening
-		gui.setPosition(ofGetWidth() - gui.getWidth() - 10, gui.getPosition().y);
+		//gui.setPosition(ofGetWidth() - gui.getWidth() - 10, gui.getPosition().y);
 		gui.draw();
 	}
+
+	pseudoBar.Draw();
 
 	ofVec3f before(mouse);
 	ofVec3f after = cam.screenToWorld(before);
@@ -243,17 +273,21 @@ void ofApp::mouseMoved(int x, int y ){
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
+	pseudoBar.mouseDragged(x, y, button);
 
+	HsError ret = measurement.GetImage(currentImageType, wavelength, currentImage);
+	if (ret != HS_ERROR_NONE)
+		return;
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+	pseudoBar.mousePressed(x, y, button);
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+	pseudoBar.mouseReleased(x, y, button);
 }
 
 //--------------------------------------------------------------
@@ -268,7 +302,7 @@ void ofApp::mouseExited(int x, int y){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
+	pseudoBar.Resize();
 }
 
 //--------------------------------------------------------------
@@ -461,17 +495,29 @@ void ofApp::updateCurrentImage()
 	if (showColorPseudo)
 		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
 	else if (showColorPseudoContour)
-		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO_CONTOUR;
 	else if (showColorGrayscale)
-		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+		currentColorType = HS_IMAGE_COLOR_TYPE_GRAYSCALE;
 	else if (showColorGrayscaleContour)
-		currentColorType = HS_IMAGE_COLOR_TYPE_PSEUDO;
+		currentColorType = HS_IMAGE_COLOR_TYPE_GRAYSCALE_CONTOUR;
 	else if (showColorRGB)
 		currentColorType = HS_IMAGE_COLOR_TYPE_RGB;
 
 	HsError ret = measurement.GetImage(currentImageType, wavelength, currentImage);
 	if (ret != HS_ERROR_NONE)
 		return;
+
+	HsColorSetting color_setting;
+	HsStatistics stats;
+
+	measurement.GetColorSetting(currentImageType, &color_setting);
+	measurement.GetStatistics(currentImageType, &stats);
+
+	pseudoBar.set_current_image_type(currentImageType);
+	pseudoBar.set_upper_bound_value(color_setting.level_max);
+	pseudoBar.set_lower_bound_value(color_setting.level_min);
+	pseudoBar.set_upper_end_value(stats.max);
+	pseudoBar.set_lower_end_value(stats.min);
 
 	if (showHistogram) {
 		ret = measurement.GetHistogram(currentImageType, 255, histogram);

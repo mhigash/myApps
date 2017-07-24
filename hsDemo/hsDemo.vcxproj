@@ -171,6 +171,7 @@
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ColorBar.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MeasurementDataSet.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="..\..\..\addons\ofxOpenCv\src\ofxCvShortImage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ColorBar.h" />
     <ClInclude Include="src\MeasurementDataSet.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="..\..\..\addons\ofxGui\src\ofxBaseGui.h" />

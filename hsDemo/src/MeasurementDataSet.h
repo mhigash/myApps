@@ -29,6 +29,14 @@ public:
 	HsError Load(const std::string& filename);
 	HsError GetImage(HsImageDataType image_type, int wavelength, ofImage& image);
 	HsError GetHistogram(HsImageDataType image_type, float bin, std::vector<int>& histogram);
-	//HsError getPixelData(int x, int y, 
+
+	void GetData(HsMeasurementData *measurement_data);
+	
+	void GetStatistics(HsImageDataType image_type, HsStatistics *statistics);
+
+	void GetColorSetting(HsImageDataType image_type, HsColorSetting *color_setting);
+	void SetColorSetting(HsImageDataType image_type, const HsColorSetting &color_setting);
+	
+	void ToOfImage(const HsImage8u3 &src_image, ofImage& image);
 };
 

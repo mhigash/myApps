@@ -160,10 +160,12 @@ void ofApp::draw(){
     float offset_y = height * margin;
     bool invert_y = true;
     
-    ofSetColor(128, 128, 255);
-    //ofSetColor(128, 255, 128);
     ofRectangle rect(offset_x, offset_y, width * scale, height * scale);
+
+    ofNoFill();
+    ofSetColor(ofColor::black);
     ofDrawRectangle(rect);
+    ofFill();
     
     float* p = reinterpret_cast<float*>(data_.data);
     for (int r = 0; r < data_.rows; r++) {

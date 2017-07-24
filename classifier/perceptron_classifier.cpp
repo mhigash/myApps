@@ -86,13 +86,13 @@ float PerceptronClassifier::NetInput(const std::vector<float> &x)
 {
 	// Calculate net input
 
-	float dot = 0;
+	float inner_product = 0;
 	for (int i = 0; i < x.size(); i++) {
-		dot += x[i] * w_[i];
+		inner_product += x[i] * w_[i];
 	}
-	dot += w0_;
+	inner_product += w0_;
 
-	return dot;
+	return inner_product;
 }
 
 float PerceptronClassifier::Predict(const cv::Mat &data)

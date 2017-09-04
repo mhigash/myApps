@@ -84,6 +84,7 @@ int NeuralNetwork::GetMaxOutputId()
     double max_value;
     
     max_value = output_layer_.neuron_values_[0];
+	id = 0;
     
     for (i = 1; i < output_layer_.number_of_nodes_; i++) {
         if (output_layer_.neuron_values_[i] > max_value) {
@@ -100,7 +101,7 @@ double NeuralNetwork::CaluculateError()
     double error = 0.0;
     
     for (i = 0; i < output_layer_.number_of_nodes_; i++) {
-        error += powf(output_layer_.neuron_values_[i] - output_layer_.desired_values_[i], 2);
+        error += pow(output_layer_.neuron_values_[i] - output_layer_.desired_values_[i], 2);
     }
     
     error /= output_layer_.number_of_nodes_;

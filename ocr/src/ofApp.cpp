@@ -112,9 +112,10 @@ void ofApp::setup(){
     double error = 1.0;
     int c = 0;
     
-    the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PreTraining.txt");
-    
-    while (error > 0.05f && c < 50000) {
+	//the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PreTraining.txt");
+	the_brain_.DumpData("PreTraining.txt");
+
+    while (error > 0.05 && c < 50000) {
         error = 0;
         c++;
         
@@ -136,7 +137,8 @@ void ofApp::setup(){
         error /= 14.0;
     }
     
-    the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt");
+	//the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt");
+	the_brain_.DumpData("PostTraining.txt");
 }
 
 //--------------------------------------------------------------
@@ -150,6 +152,8 @@ void ofApp::draw(){
     const int canvas_rows = 32;
     const int n = canvas_rows * canvas_cols;
     
+	if (train_images_.size() <= 0) return;
+
     for (int i = 0; i < n; i++) {
         ofImage image = train_images_[i].first;
         int label     = train_images_[i].second;

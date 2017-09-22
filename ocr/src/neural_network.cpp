@@ -6,6 +6,8 @@
 //
 //
 
+
+#include <limits>
 #include "neural_network.hpp"
 
 NeuralNetwork::NeuralNetwork()
@@ -49,7 +51,8 @@ void NeuralNetwork::SetInput(int i, double value)
 
 double NeuralNetwork::GetOutput(int i)
 {
-    double error = std::numeric_limits<double>::max();
+    //double error = std::numeric_limits<double>::max();
+    double error = -99999.9;
     if (i < 0) return error;
     if (i >= output_layer_.number_of_nodes_) return error;
     return output_layer_.neuron_values_[i];

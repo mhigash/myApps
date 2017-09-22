@@ -1,19 +1,26 @@
 #pragma once
 
 #include "ofMain.h"
-#include "neural_network.hpp"
+#include "ofxGui.h"
+
+#include "mnist_test.hpp"
+
+typedef std::vector<std::pair<ofImage, unsigned char>> ImageLabelList;
 
 class ofApp : public ofBaseApp{
 
-    bool load_mnist(const std::string &path,
-                    const std::string &kind,
-                    std::vector<std::pair<ofImage, unsigned char>> *images);
+    MnistTest mnist_;
     
-    std::vector<std::pair<ofImage, unsigned char>> train_images_;
-    std::vector<std::pair<ofImage, unsigned char>> t10k_images_;
-    
-    NeuralNetwork the_brain_;
-    
+	ofxGuiGroup type_gui_;
+	ofParameter<bool> type_train_;
+	ofParameter<bool> type_t10k_;
+
+    ofxPanel gui;
+
+	void ResetTypes();
+	void TypeTrainChanged(bool& show);
+	void TypeT10kChanged(bool& show);
+
 	public:
 		void setup();
 		void update();

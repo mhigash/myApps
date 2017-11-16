@@ -119,7 +119,6 @@ bool MnistTest::Train() {
     double error = 1.0;
     int c = 0;
     
-
     std::string pre_training_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PreTraining.txt";
     std::string post_training_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt";
     std::string result_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/result.txt";

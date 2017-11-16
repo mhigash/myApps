@@ -1,5 +1,5 @@
 #include "MyNeuralNetwork.h"
-#include <malloc.h>
+//#include <malloc.h>
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
@@ -363,7 +363,7 @@ void	NeuralNetwork::SetMomentum(bool useMomentum, double factor)
 
 }
 
-void NeuralNetwork::DumpData(char* filename)
+void NeuralNetwork::DumpData(const char* filename)
 {
 	FILE*	f;
 	int		i, j;

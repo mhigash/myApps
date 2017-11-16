@@ -17,7 +17,10 @@ int big_endian(int little) {
     return big;
 }
 
-MnistTest::MnistTest() {
+MnistTest::MnistTest()
+: image_rows_(0)
+, image_cols_(0)
+{
 }
 
 MnistTest::~MnistTest() {
@@ -73,6 +76,9 @@ bool MnistTest::Load(const std::string &path,
     rows  = big_endian(rows);
     cols  = big_endian(cols);
     
+    image_rows_ = rows;
+    image_cols_ = cols;
+    
     int size = rows * cols;
     
     unsigned char* buf = new unsigned char[size];
@@ -113,8 +119,12 @@ bool MnistTest::Train() {
     double error = 1.0;
     int c = 0;
     
-	//the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PreTraining.txt");
-	the_brain_.DumpData("PreTraining.txt");
+
+    std::string pre_training_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PreTraining.txt";
+    std::string post_training_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt";
+    std::string result_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/result.txt";
+    
+	the_brain_.DumpData(pre_training_path.c_str());
 
 	time_t start, finish;
 	double elapsed_time;
@@ -122,7 +132,7 @@ bool MnistTest::Train() {
 	time(&start);// get the start time
 
 	//while (error > 0.05 && c < 50000) {
-	while (error > 0.05 && c < 50) {
+	while (error > 0.05 && c < 500) {
         error = 0;
 		image_count = 0;
         c++;
@@ -156,9 +166,9 @@ bool MnistTest::Train() {
     }
 
 	//the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt");
-	the_brain_.DumpData("PostTraining.txt");
+	the_brain_.DumpData(post_training_path.c_str());
 
-	std::ofstream result(".\\result.txt");
+	std::ofstream result(result_path);
 
 	time(&finish);// get the end time
 	elapsed_time = difftime(finish, start);
@@ -204,7 +214,31 @@ bool MnistTest::Train() {
 
 bool MnistTest::LoadData(const std::string &path) {
 	bool is_loaded = false;
-	is_loaded = Load(path, "train", &train_images_);
-	is_loaded = Load(path, "t10k",  &t10k_images_);
+	is_loaded = Load(path, kTrain, &train_images_);
+	is_loaded = Load(path, kT10k,  &t10k_images_);
 	return true;
+}
+
+int MnistTest::GetImageCount(const std::string &kind) {
+    if (kind == kTrain) {
+        return train_images_.size();
+    } else if (kind == kT10k) {
+        return t10k_images_.size();
+    }
+    
+    return -1;
+}
+
+bool MnistTest::GetImage(std::string &kind,
+                         int index,
+                         ImageAndLabel &image_and_label) {
+    if (kind == kTrain) {
+        image_and_label = train_images_[index];
+    } else if (kind == kT10k) {
+        image_and_label = t10k_images_[index];
+    } else {
+        return false;
+    }
+        
+    return true;
 }

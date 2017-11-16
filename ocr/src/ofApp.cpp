@@ -40,12 +40,23 @@ void ofApp::setup() {
 	gui.add(&type_gui_);
 
 
-	//std::string path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/mnist/";
-	std::string path = "D:\\Vi\\ViSample\\python_machine_learning\\";
+	std::string path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/mnist/";
+	//std::string path = "D:\\Vi\\ViSample\\python_machine_learning\\";
 
 	mnist_.LoadData(path);
+    mnist_.Train();
 
 	//train_the_brain();
+    
+    const int canvas_cols = 32;
+    const int canvas_rows = 32;
+    const int image_cols = 28;
+    const int image_rows = 28;
+    const int size = canvas_cols * canvas_rows * image_cols * image_rows;
+    unsigned char* pixels = new unsigned char[size];
+    
+    ofImage image;
+    
 }
 
 //--------------------------------------------------------------
@@ -59,16 +70,25 @@ void ofApp::draw(){
     const int canvas_rows = 32;
     const int n = canvas_rows * canvas_cols;
 
-	ImageLabelList &images = train_images_;
+    std::string kind = kTrain;
 	if (type_t10k_)
-		images = t10k_images_;
+		kind = kT10k;
 
-	if (images.size() <= 0) return;
+	if (mnist_.GetImageCount(kind) <= 0) return;
 
     for (int i = 0; i < n; i++) {
-        ofImage image = images[i].first;
-        int label     = images[i].second;
+        ImageAndLabel image_and_label;
+        mnist_.GetImage(kind, i, image_and_label);
         
+        ofImage image;
+        int rows = mnist_.GetImageHeight();
+        int cols = mnist_.GetImageWidth();
+        image.setFromPixels(image_and_label.first,
+                            mnist_.GetImageWidth(),
+                            mnist_.GetImageHeight(),
+                            ofImageType::OF_IMAGE_GRAYSCALE);
+
+        int label     = image_and_label.second;
         int w = image.getWidth();
         int h = image.getHeight();
         

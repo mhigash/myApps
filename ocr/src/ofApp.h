@@ -5,8 +5,6 @@
 
 #include "mnist_test.hpp"
 
-typedef std::vector<std::pair<ofImage, unsigned char>> ImageLabelList;
-
 class ofApp : public ofBaseApp{
 
     MnistTest mnist_;

@@ -19,11 +19,17 @@
 //#include "neural_network.hpp"
 #include "MyNeuralNetwork.h"
 
-class MnistTest {
-	typedef std::vector<std::pair<unsigned char*, unsigned char>> ImageLabelList;
+static const std::string kTrain = "train";
+static const std::string kT10k = "t10k";
 
+typedef std::pair<unsigned char*, unsigned char> ImageAndLabel;
+typedef std::vector<std::pair<unsigned char*, unsigned char>> ImageLabelList;
+
+class MnistTest {
 	ImageLabelList train_images_;
 	ImageLabelList t10k_images_;
+    int image_rows_;
+    int image_cols_;
 
 	NeuralNetwork the_brain_;
 
@@ -35,6 +41,13 @@ public:
 
 	bool LoadData(const std::string &path);
 	bool Train();
+    
+    int GetImageCount(const std::string &kind);
+    int GetImageWidth() { return image_cols_; }
+    int GetImageHeight() { return image_rows_; }
+    bool GetImage(std::string &kind,
+                  int index,
+                  ImageAndLabel &image_and_label);
 };
 
 

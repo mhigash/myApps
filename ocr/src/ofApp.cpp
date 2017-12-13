@@ -39,12 +39,16 @@ void ofApp::setup() {
 
 	gui.add(&type_gui_);
 
+    verdana14.load("verdana.ttf", 14, true, true);
+    verdana14.setLineHeight(18.0f);
+    verdana14.setLetterSpacing(1.037);
+
 
 	std::string path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/mnist/";
 	//std::string path = "D:\\Vi\\ViSample\\python_machine_learning\\";
 
 	mnist_.LoadData(path);
-    mnist_.Train();
+    mnist_.StartTraining();
 
 	//train_the_brain();
     
@@ -54,8 +58,6 @@ void ofApp::setup() {
     const int image_rows = 28;
     const int size = canvas_cols * canvas_rows * image_cols * image_rows;
     unsigned char* pixels = new unsigned char[size];
-    
-    ofImage image;
     
 }
 
@@ -105,6 +107,28 @@ void ofApp::draw(){
         ofSetColor(255, 0, 0);
         ofDrawBitmapString(label_string.str(), pt.x + w / 2, pt.y + h);
     }
+    
+    Progress progress = mnist_.progress();
+    
+    ofSetColor(128, 128, 128);
+    ofDrawRectangle(500, 100, 200, 200);
+    
+    ofSetColor(255, 255, 255);
+    
+    std::stringstream progress_info;
+    progress_info << "image: " << std::setw(5) << progress.image_count << "/" << std::setw(5) <<
+        progress.max_image_count;
+    verdana14.drawString(progress_info.str(), 500, 120);
+    //ofDrawBitmapString(progress_info.str(), 100, 100);
+    
+    progress_info.str("");
+    progress_info << "train: " << std::setw(5) << progress.training_count << "/" << std::setw(5) << progress.max_training_count;
+    verdana14.drawString(progress_info.str(), 500, 140);
+    //ofDrawBitmapString(progress_info.str(), 100, 150);
+
+    progress_info.str("");
+    progress_info << "error: " << progress.error;
+    verdana14.drawString(progress_info.str(), 500, 160);
 
 	gui.draw();
 }

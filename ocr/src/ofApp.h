@@ -15,6 +15,8 @@ class ofApp : public ofBaseApp{
 
     ofxPanel gui;
 
+    ofTrueTypeFont    verdana14;
+
 	void ResetTypes();
 	void TypeTrainChanged(bool& show);
 	void TypeT10kChanged(bool& show);

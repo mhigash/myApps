@@ -8,6 +8,8 @@
 
 #include "mnist_test.hpp"
 
+#include <thread>
+
 int big_endian(int little) {
     int big = 0;
     big |= (little & 0xFF000000) >> 24;
@@ -24,20 +26,19 @@ MnistTest::MnistTest()
 }
 
 MnistTest::~MnistTest() {
-	ImageLabelList::iterator iter;
-	unsigned char *data = nullptr;
+    // need to wait until the thread will be stopped.
+    cancel_requested_ = true;
+    thread_->join();
 
-	for (iter = train_images_.begin(); iter != train_images_.end(); iter++) {
-		data = iter->first;
-		delete[] data;
-	}
-	train_images_.clear();
-
-	for (iter = t10k_images_.begin(); iter != t10k_images_.end(); iter++) {
-		data = iter->first;
-		delete[] data;
-	}
-	t10k_images_.clear();
+    for (auto im_lb : train_images_) {
+        delete[] im_lb.first;
+    }
+    train_images_.clear();
+    
+    for (auto im_lb : t10k_images_) {
+        delete[] im_lb.first;
+    }
+    t10k_images_.clear();
 }
 
 bool MnistTest::Load(const std::string &path,
@@ -100,14 +101,15 @@ bool MnistTest::Load(const std::string &path,
     return true;
 }
 
-bool MnistTest::Train() {
-	const int kInputNum = 784; // 28 rows * 28 cols in image
-	const int kOutputNum = 10;
-	const int kMaxTrainingCount = 1024;
-	const int kMaxTestCount = 128;
+bool MnistTest::StartTraining() {
+    cancel_requested_ = false;
+    thread_.reset(new std::thread(&MnistTest::Train, this));
+    return true;
+}
 
-	ImageLabelList::iterator iter;
-	int image_count = 0;
+bool MnistTest::Train() {
+
+//    ImageLabelList::iterator iter;
 
     // Train the brain
 //	the_brain_.Initialize(4, 3, 3);
@@ -115,9 +117,10 @@ bool MnistTest::Train() {
     the_brain_.SetLearningRate(0.2);
     the_brain_.SetMomentum(true, 0.9);
     
-    int i;
-    double error = 1.0;
-    int c = 0;
+    progress_.error = 1.0;
+    progress_.training_count = 0;
+    progress_.max_image_count = kMaxTrainingImageCount;
+    progress_.max_training_count = kMaxTrainingCount;
     
     std::string pre_training_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PreTraining.txt";
     std::string post_training_path = "/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt";
@@ -131,40 +134,42 @@ bool MnistTest::Train() {
 	time(&start);// get the start time
 
 	//while (error > 0.05 && c < 50000) {
-	while (error > 0.05 && c < 500) {
-        error = 0;
-		image_count = 0;
-        c++;
+	while (progress_.error > 0.05 && progress_.training_count < kMaxTrainingCount) {
+        if (cancel_requested_)
+            return false;
         
-		for (iter = train_images_.begin(); iter != train_images_.end(); iter++) {
-			image_count++;
+        progress_.error = 0;
+		progress_.image_count = 0;
+        progress_.training_count++;
+        
+        //for (iter = train_images_.begin(); iter != train_images_.end(); iter++) {
+        for (auto im_lb : train_images_) {
+			progress_.image_count++;
 
-			unsigned char *data = iter->first;
-			unsigned char label = iter->second;
+			unsigned char *data = im_lb.first;
+			unsigned char label = im_lb.second;
 
 			double one_hot[kOutputNum];
 			memset(one_hot, 0, sizeof(one_hot));
 			one_hot[label] = 1.0;
 
-			for (i = 0; i < kInputNum; i++) {
+			for (int i = 0; i < kInputNum; i++) {
 				the_brain_.SetInput(i, data[i]);
 			}
 
-			for (i = 0; i < kOutputNum; i++) {
+			for (int i = 0; i < kOutputNum; i++) {
 				the_brain_.SetDesiredOutput(i, one_hot[i]);
 			}
 
 			the_brain_.FeedForward();
-			error += the_brain_.CalculateError();
+			progress_.error += the_brain_.CalculateError();
 			the_brain_.BackPropagate();
 
-			if (image_count >= kMaxTrainingCount) break; // DEBUG: 60000 images and 50 counts cannot end in 12 hours!
+			if (progress_.image_count >= kMaxTrainingImageCount) break; // DEBUG: 60000 images and 50 counts cannot end in 12 hours!
 		}
 
-		error /= image_count;
+		progress_.error /= progress_.image_count;
     }
-
-	//the_brain_.DumpData("/Users/hgsmrmss/Documents/code_samples/openframeworks/of_v0.9.8_osx_release/apps/myApps/ocr/bin/PostTraining.txt");
 	the_brain_.DumpData(post_training_path.c_str());
 
 	std::ofstream result(result_path);
@@ -173,20 +178,24 @@ bool MnistTest::Train() {
 	elapsed_time = difftime(finish, start);
 
 	result << "It took " << elapsed_time << " seconds." << std::endl;
-	result << "max training count: " << kMaxTrainingCount << std::endl;
-	result << "max test count:     " << kMaxTestCount << std::endl;
-	result << "iteration count:    " << c << std::endl;
+	result << "max training count: " << kMaxTrainingImageCount << std::endl;
+	result << "max test count:     " << kMaxTestImageCount << std::endl;
+	result << "iteration count:    " << progress_.training_count << std::endl;
 
 	int correct_count = 0;
-	image_count = 0;
+	progress_.image_count = 0;
 
 	//for (iter = t10k_images_.begin(); iter != t10k_images_.end(); iter++) {
-	for (iter = train_images_.begin(); iter != train_images_.end(); iter++) {
-		image_count++;
-		unsigned char *data = iter->first;
-		unsigned char label = iter->second;
+	//for (iter = train_images_.begin(); iter != train_images_.end(); iter++) {
+    for (auto im_lb : train_images_) {
+        if (cancel_requested_)
+            return false;
+        
+		progress_.image_count++;
+		unsigned char *data = im_lb.first;
+		unsigned char label = im_lb.second;
 
-		for (i = 0; i < kInputNum; i++) {
+		for (int i = 0; i < kInputNum; i++) {
 			the_brain_.SetInput(i, data[i]);
 		}
 
@@ -201,11 +210,11 @@ bool MnistTest::Train() {
 		result << "t,c = [" << true_label << ", " << 
 			classified_label << "]; " << correct << std::endl;
 
-		if (image_count >= kMaxTestCount) break; // DEBUG: 
+		if (progress_.image_count >= kMaxTestImageCount) break; // DEBUG:
 	}
 
 	float ratio = static_cast<float>(correct_count) /
-	   	static_cast<float>(image_count);
+	   	static_cast<float>(progress_.image_count);
 	result << "correct ratio: " << ratio << std::endl;
 
 	return true;
